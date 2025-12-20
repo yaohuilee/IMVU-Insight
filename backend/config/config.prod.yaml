@@ -1,0 +1,13 @@
+app:
+  name: "IMVU Insight API"
+  env: "prod"
+  api_v1_prefix: "/api/v1"
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "imvu"
+  password: "change_me"
+  db: "imvu_insight"
+  echo: false
+

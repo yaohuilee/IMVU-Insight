@@ -1,0 +1,63 @@
+
+from __future__ import annotations
+
+import logging
+
+from fastapi import APIRouter, Depends, FastAPI
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.config import get_settings
+from app.core.db import check_db_connection, get_db_session
+
+
+settings = get_settings()
+
+app = FastAPI(
+	title=settings.app.name,
+	version="0.1.0",
+)
+
+
+router = APIRouter()
+
+
+logger = logging.getLogger(__name__)
+
+
+@router.get("/health")
+async def health() -> dict:
+	return {"status": "ok"}
+
+
+@router.get("/health/db")
+async def health_db(session: AsyncSession = Depends(get_db_session)) -> dict:
+	try:
+		await check_db_connection(session)
+		return {"status": "ok", "db": "ok"}
+	except SQLAlchemyError as exc:
+		# Health-check endpoint: don't leak internal exception details or spam traceback.
+		logger.warning("DB health check failed (%s): %s", type(exc).__name__, str(exc))
+		return JSONResponse(
+			status_code=503,
+			content={
+				"status": "error",
+				"db": "error",
+					"message": "Database is unhealthy: unable to connect.",
+			},
+		)
+	except Exception as exc:
+		logger.warning("DB health check failed (unexpected %s): %s", type(exc).__name__, str(exc))
+		return JSONResponse(
+			status_code=503,
+			content={
+				"status": "error",
+				"db": "error",
+					"message": "Database is unhealthy: unable to connect.",
+			},
+		)
+
+
+app.include_router(router)
+

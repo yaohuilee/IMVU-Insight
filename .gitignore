@@ -51,9 +51,28 @@ build/
 .cache/
 .turbo/
 
+# --- Frontend (Umi local/dev artifacts) ---
+# Keep frontend-local env & local configs out of git
+frontend/.env.local
+frontend/.umirc.local.ts
+frontend/config/config.local.ts
+
+# Umi temp/build directories (generated)
+frontend/src/.umi
+frontend/src/.umi-production
+frontend/src/.umi-test
+frontend/.umi
+frontend/.umi-production
+frontend/.umi-test
+
+# Other frontend tooling caches
+frontend/.mfsu
+frontend/.swc
+
 # --- IDE / OS ---
 .vscode/
 .idea/
 *.iml
 .DS_Store
 Thumbs.db
+.yarn

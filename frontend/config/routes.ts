@@ -1,7 +1,12 @@
 export default [
   {
     path: '/',
-    redirect: '/dashboard',
+    redirect: '/login',
+  },
+  {
+    path: '/login',
+    layout: false,
+    component: './Login',
   },
   {
     name: 'Dashboard',

@@ -1,10 +1,40 @@
 export default {
   'app.name': 'IMVU Insight',
+  'component.account.logout': '登出',
 
   'menu.dashboard': '儀表板',
+  'menu.dataManagement': '數據管理',
+  'menu.dataManagement.dataSync': '數據同步',
+  'menu.dataManagement.snapshots': '快照',
+  'menu.dataManagement.dataQuality': '數據品質',
   'menu.dataSync': '資料同步',
 
+  'menu.businessAnalysis': '業務分析',
+  'menu.businessAnalysis.customers.buyers': '買家',
+  'menu.businessAnalysis.customers.recipients': '收件方',
+  'menu.businessAnalysis.products': '產品',
+  'menu.businessAnalysis.sales': '銷售',
+
+  'menu.imvuGraph': 'IMVU 圖譜',
+  'menu.imvuGraph.users': 'IMVU 用戶',
+  'menu.imvuGraph.relations': '用戶關係',
+  'menu.imvuGraph.entityExplorer': '實體探索',
+
+  'menu.system': '系統',
+  'menu.system.about': '關於',
+  'menu.system.developers': '開發者',
+  'menu.system.settings': '設定',
+
+  'system.about.pageTitle': '關於',
+  'system.developers.pageTitle': '開發者',
+  'system.settings.pageTitle': '系統設定',
+
   'dashboard.pageTitle': '儀表板',
+
+  'businessAnalysis.customers.buyers.pageTitle': '買家',
+  'businessAnalysis.customers.recipients.pageTitle': '收件方',
+  'businessAnalysis.products.pageTitle': '產品',
+  'businessAnalysis.sales.pageTitle': '銷售',
 
   'dataSync.pageTitle': '資料同步',
   'dataSync.uploadTitle': '上傳檔案',

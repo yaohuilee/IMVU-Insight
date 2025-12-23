@@ -1,10 +1,40 @@
-export default {
+  export default {
   'app.name': 'IMVU Insight',
+  'component.account.logout': 'ログアウト',
 
   'menu.dashboard': 'ダッシュボード',
+  'menu.dataManagement': 'データ管理',
+  'menu.dataManagement.dataSync': 'データ同期',
+  'menu.dataManagement.snapshots': 'スナップショット',
+  'menu.dataManagement.dataQuality': 'データ品質',
   'menu.dataSync': 'データ同期',
 
+  'menu.businessAnalysis': 'ビジネス分析',
+  'menu.businessAnalysis.customers.buyers': 'バイヤー',
+  'menu.businessAnalysis.customers.recipients': '受取人',
+  'menu.businessAnalysis.products': '製品',
+  'menu.businessAnalysis.sales': '売上',
+
+  'menu.imvuGraph': 'IMVUグラフ',
+  'menu.imvuGraph.users': 'IMVUユーザー',
+  'menu.imvuGraph.relations': 'ユーザー関係',
+  'menu.imvuGraph.entityExplorer': 'エンティティエクスプローラー',
+
+  'menu.system': 'システム',
+  'menu.system.about': '概要',
+  'menu.system.developers': '開発者',
+  'menu.system.settings': '設定',
+
+  'system.about.pageTitle': '概要',
+  'system.developers.pageTitle': '開発者',
+  'system.settings.pageTitle': 'システム設定',
+
   'dashboard.pageTitle': 'ダッシュボード',
+
+  'businessAnalysis.customers.buyers.pageTitle': 'バイヤー',
+  'businessAnalysis.customers.recipients.pageTitle': '受取人',
+  'businessAnalysis.products.pageTitle': '製品',
+  'businessAnalysis.sales.pageTitle': '売上',
 
   'dataSync.pageTitle': 'データ同期',
   'dataSync.uploadTitle': 'ファイルのアップロード',

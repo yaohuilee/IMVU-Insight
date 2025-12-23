@@ -1,9 +1,39 @@
 export default {
 	'app.name': 'IMVU Insight',
+	'component.account.logout': '注销',
 	'menu.dashboard': '仪表盘',
+	'menu.dataManagement': '数据管理',
+	'menu.dataManagement.dataSync': '数据同步',
+	'menu.dataManagement.snapshots': '快照',
+	'menu.dataManagement.dataQuality': '数据质量',
 	'menu.dataSync': '数据同步',
 
+	'menu.businessAnalysis': '业务分析',
+	'menu.businessAnalysis.customers.buyers': '买家',
+	'menu.businessAnalysis.customers.recipients': '收件方',
+	'menu.businessAnalysis.products': '产品',
+	'menu.businessAnalysis.sales': '销售',
+
+	'menu.imvuGraph': 'IMVU 图谱',
+	'menu.imvuGraph.users': 'IMVU 用户',
+	'menu.imvuGraph.relations': '用户关系',
+	'menu.imvuGraph.entityExplorer': '实体探索',
+
+	'menu.system': '系统',
+	'menu.system.about': '关于',
+	'menu.system.developers': '开发者',
+	'menu.system.settings': '设置',
+
+	'system.about.pageTitle': '关于',
+	'system.developers.pageTitle': '开发者',
+	'system.settings.pageTitle': '系统设置',
+
 	'dashboard.pageTitle': '仪表盘',
+
+	'businessAnalysis.customers.buyers.pageTitle': '买家',
+	'businessAnalysis.customers.recipients.pageTitle': '收件方',
+	'businessAnalysis.products.pageTitle': '产品',
+	'businessAnalysis.sales.pageTitle': '销售',
 
 	'dataSync.pageTitle': '数据同步',
 	'dataSync.uploadTitle': '上传文件',

@@ -1,7 +1,7 @@
-import { RunTimeLayoutConfig, SelectLang } from '@umijs/max';
+import { RunTimeLayoutConfig } from '@umijs/max';
 import React from 'react';
-
-export { request } from '@/services/request';
+import { HelmetProvider } from 'react-helmet-async';
+import AccountMenu from '@/components/AccountMenu';
 
 export const layout: RunTimeLayoutConfig = ({ }) => {
   return {
@@ -10,6 +10,10 @@ export const layout: RunTimeLayoutConfig = ({ }) => {
     menu: {
       locale: true,
     },
-    rightContentRender: () => React.createElement(SelectLang),
+    rightContentRender: () => React.createElement(AccountMenu, null),
   };
+};
+
+export const rootContainer = (container: React.ReactNode) => {
+  return React.createElement(HelmetProvider, null, container);
 };

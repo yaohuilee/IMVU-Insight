@@ -3,6 +3,7 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
 import { Form, theme } from 'antd';
 import React, { useEffect, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 type LoginFormValues = {
     username: string;
@@ -17,10 +18,7 @@ const Login: React.FC = () => {
     const { formatMessage } = useIntl();
     const [form] = Form.useForm<LoginFormValues>();
 
-    useEffect(() => {
-        if (typeof document === 'undefined') return;
-        document.title = `${formatMessage({ id: 'login.pageTitle' })} - ${formatMessage({ id: 'app.name' })}`;
-    }, [formatMessage]);
+    const title = `${formatMessage({ id: 'login.pageTitle' })} - ${formatMessage({ id: 'app.name' })}`;
 
     const rememberedUsername = useMemo(() => {
         try {
@@ -71,6 +69,9 @@ const Login: React.FC = () => {
             <div style={{ position: 'absolute', top: 16, right: 16 }}>
                 <SelectLang />
             </div>
+            <Helmet>
+                <title>{title}</title>
+            </Helmet>
             <LoginForm<LoginFormValues>
                 form={form}
                 title={formatMessage({ id: 'login.title' })}

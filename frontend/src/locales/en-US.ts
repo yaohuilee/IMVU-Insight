@@ -1,9 +1,38 @@
 export default {
+		'menu.imvuGraph': 'IMVU Graph',
+		'menu.imvuGraph.users': 'IMVU Users',
+		'menu.imvuGraph.relations': 'User Relations',
+		'menu.imvuGraph.entityExplorer': 'Entity Explorer',
 	'app.name': 'IMVU Insight',
+	'component.account.logout': 'Logout',
 	'menu.dashboard': 'Dashboard',
+	'menu.dataManagement': 'Data Management',
+	'menu.dataManagement.dataSync': 'Data Sync',
+	'menu.dataManagement.snapshots': 'Snapshots',
+	'menu.dataManagement.dataQuality': 'Data Quality',
 	'menu.dataSync': 'Data Sync',
 
+	'menu.businessAnalysis': 'Business Analysis',
+	'menu.businessAnalysis.customers.buyers': 'Buyers',
+	'menu.businessAnalysis.customers.recipients': 'Recipients',
+	'menu.businessAnalysis.products': 'Products',
+	'menu.businessAnalysis.sales': 'Sales',
+
+	'menu.system': 'System',
+	'menu.system.about': 'About',
+	'menu.system.developers': 'Developers',
+	'menu.system.settings': 'Settings',
+
+	'system.about.pageTitle': 'About',
+	'system.developers.pageTitle': 'Developers',
+	'system.settings.pageTitle': 'System Settings',
+
 	'dashboard.pageTitle': 'Dashboard',
+
+	'businessAnalysis.customers.buyers.pageTitle': 'Buyers',
+	'businessAnalysis.customers.recipients.pageTitle': 'Recipients',
+	'businessAnalysis.products.pageTitle': 'Products',
+	'businessAnalysis.sales.pageTitle': 'Sales',
 
 	'dataSync.pageTitle': 'Data Sync',
 	'dataSync.uploadTitle': 'Upload File',

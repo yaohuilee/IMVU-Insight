@@ -1,6 +1,7 @@
 import React from 'react';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
+import { Helmet } from 'react-helmet-async';
 import { Form, Upload, Button, Checkbox, Tag, Space, message, Col, Row } from 'antd';
 import { InboxOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
@@ -15,7 +16,7 @@ type HistoryItem = {
     type: string;
     fileName: string;
     records: string;
-    status: '成功' | '部分失败' | '失败';
+    status: 'Success' | 'Partial Failure' | 'Failure';
 };
 
 const DataSync: React.FC = () => {
@@ -30,7 +31,7 @@ const DataSync: React.FC = () => {
             type: 'Income',
             fileName: 'incomelog.xml',
             records: '12,345',
-            status: '成功',
+            status: 'Success',
         },
         {
             key: '2',
@@ -38,14 +39,11 @@ const DataSync: React.FC = () => {
             type: 'Product',
             fileName: 'productlist.xml',
             records: '1,230',
-            status: '部分失败',
+            status: 'Partial Failure',
         },
     ]);
 
-    React.useEffect(() => {
-        if (typeof document === 'undefined') return;
-        document.title = `${formatMessage({ id: 'dataSync.pageTitle' })} - ${formatMessage({ id: 'app.name' })}`;
-    }, [formatMessage]);
+    const title = `${formatMessage({ id: 'dataSync.pageTitle' })} - ${formatMessage({ id: 'app.name' })}`;
 
     const handleBeforeUpload = (file: UploadFile, type: 'Product' | 'Income') => {
         if (type === 'Product') {
@@ -74,7 +72,7 @@ const DataSync: React.FC = () => {
             type: chosenType,
             fileName: chosenFile.name || 'upload',
             records: '-',
-            status: '成功',
+            status: 'Success',
         };
         setHistory((h) => [newItem, ...h]);
         message.success(formatMessage({ id: 'dataSync.uploadSuccess' }));
@@ -91,9 +89,10 @@ const DataSync: React.FC = () => {
         {
             title: formatMessage({ id: 'dataSync.table.status' }),
             dataIndex: 'status',
-            render: (s: string) => {
-                const color = s === '成功' ? 'green' : s === '部分失败' ? 'orange' : 'red';
-                return <Tag color={color as any}>{s}</Tag>;
+            render: (dom: React.ReactNode, entity: HistoryItem) => {
+                const status = entity.status;
+                const color = status === 'Success' ? 'green' : status === 'Partial Failure' ? 'orange' : 'red';
+                return <Tag color={color as any}>{status}</Tag>;
             },
         },
         {
@@ -102,14 +101,18 @@ const DataSync: React.FC = () => {
             render: (_: any, record: HistoryItem) => (
                 <Space>
                     <a>{formatMessage({ id: 'dataSync.table.view' })}</a>
-                    {record.status !== '成功' && <a>{formatMessage({ id: 'dataSync.table.error' })}</a>}
+                    {record.status !== 'Success' && <a>{formatMessage({ id: 'dataSync.table.error' })}</a>}
                 </Space>
             ),
         },
     ];
 
     return (
-        <PageContainer title={formatMessage({ id: 'dataSync.pageTitle' })}>
+        <>
+            <Helmet>
+                <title>{title}</title>
+            </Helmet>
+            <PageContainer title={formatMessage({ id: 'dataSync.pageTitle' })}>
 
             <ProCard
                 title={formatMessage({ id: 'dataSync.uploadTitle' })}
@@ -228,6 +231,7 @@ const DataSync: React.FC = () => {
             </ProCard>
 
         </PageContainer>
+        </>
     );
 };
 

@@ -15,6 +15,12 @@ export default [
     component: './Dashboard',
   },
   {
+    name: 'dataSync',
+    icon: 'CloudUploadOutlined',
+    path: '/data-sync',
+    component: './DataSync',
+  },
+  {
     path: '*',
     layout: false,
     component: './404',

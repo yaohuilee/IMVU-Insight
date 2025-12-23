@@ -17,6 +17,11 @@ const Login: React.FC = () => {
     const { formatMessage } = useIntl();
     const [form] = Form.useForm<LoginFormValues>();
 
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
+        document.title = `${formatMessage({ id: 'login.pageTitle' })} - ${formatMessage({ id: 'app.name' })}`;
+    }, [formatMessage]);
+
     const rememberedUsername = useMemo(() => {
         try {
             return localStorage.getItem(STORAGE_KEY) ?? '';

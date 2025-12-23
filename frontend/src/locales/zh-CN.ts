@@ -1,5 +1,14 @@
 export default {
 	'app.name': 'IMVU Insight',
+	'menu.dashboard': '仪表盘',
+
+	'dashboard.pageTitle': '仪表盘',
+
+	'notFound.pageTitle': '页面不存在',
+	'notFound.subTitle': '抱歉，你访问的页面不存在。',
+	'notFound.backHome': '返回首页',
+
+	'login.pageTitle': '登录',
 
 	'login.title': 'IMVU Insight',
 	'login.subTitle': '使用用户名和密码登录',

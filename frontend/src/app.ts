@@ -5,6 +5,9 @@ export const layout: RunTimeLayoutConfig = ({ }) => {
   return {
     title: 'IMVU Insight',
     layout: 'side',
+    menu: {
+      locale: true,
+    },
     rightContentRender: () => React.createElement(SelectLang),
   };
 };

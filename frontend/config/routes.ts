@@ -9,7 +9,7 @@ export default [
     component: './Login',
   },
   {
-    name: 'Dashboard',
+    name: 'dashboard',
     icon: 'DashboardOutlined',
     path: '/dashboard',
     component: './Dashboard',

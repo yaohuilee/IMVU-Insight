@@ -1,6 +1,16 @@
 export default {
   'app.name': 'IMVU Insight',
 
+  'menu.dashboard': 'ダッシュボード',
+
+  'dashboard.pageTitle': 'ダッシュボード',
+
+  'notFound.pageTitle': 'ページが見つかりません',
+  'notFound.subTitle': '申し訳ありませんが、アクセスしたページは存在しません。',
+  'notFound.backHome': 'ホームへ戻る',
+
+  'login.pageTitle': 'サインイン',
+
   'login.title': 'IMVU Insight',
   'login.subTitle': 'ユーザー名とパスワードでサインインしてください',
   'login.username': 'ユーザー名',

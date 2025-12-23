@@ -11,6 +11,14 @@ export default defineConfig({
   request: {},
   fastRefresh: true,
   layout: {},
+  locale: {
+    default: 'en-US',
+    baseSeparator: '-',
+    antd: true,
+    title: true,
+    baseNavigator: false,
+    useLocalStorage: true,
+  },
   routes,
   npmClient: 'yarn',
 });

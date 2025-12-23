@@ -1,4 +1,4 @@
-import { history } from '@umijs/max';
+import { history, SelectLang, useIntl } from '@umijs/max';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
 import { Form, theme } from 'antd';
@@ -14,6 +14,7 @@ const STORAGE_KEY = 'imvu-insight.remembered-username';
 
 const Login: React.FC = () => {
     const { token } = theme.useToken();
+    const { formatMessage } = useIntl();
     const [form] = Form.useForm<LoginFormValues>();
 
     const rememberedUsername = useMemo(() => {
@@ -54,6 +55,7 @@ const Login: React.FC = () => {
         <div
             style={{
                 minHeight: '100vh',
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -61,10 +63,18 @@ const Login: React.FC = () => {
                 backgroundColor: token.colorBgLayout,
             }}
         >
+            <div style={{ position: 'absolute', top: 16, right: 16 }}>
+                <SelectLang />
+            </div>
             <LoginForm<LoginFormValues>
                 form={form}
-                title="IMVU Insight"
-                subTitle="Sign in with your username and password"
+                title={formatMessage({ id: 'login.title' })}
+                subTitle={formatMessage({ id: 'login.subTitle' })}
+                submitter={{
+                    searchConfig: {
+                        submitText: formatMessage({ id: 'login.submit' }),
+                    },
+                }}
                 onFinish={onFinish}
                 initialValues={{
                     username: '',
@@ -79,8 +89,8 @@ const Login: React.FC = () => {
                         autoComplete: 'username',
                         prefix: <UserOutlined />,
                     }}
-                    placeholder="Username"
-                    rules={[{ required: true, message: 'Please enter your username.' }]}
+                    placeholder={formatMessage({ id: 'login.username' })}
+                    rules={[{ required: true, message: formatMessage({ id: 'login.username.required' }) }]}
                 />
 
                 <ProFormText.Password
@@ -90,11 +100,13 @@ const Login: React.FC = () => {
                         autoComplete: 'current-password',
                         prefix: <LockOutlined />,
                     }}
-                    placeholder="Password"
-                    rules={[{ required: true, message: 'Please enter your password.' }]}
+                    placeholder={formatMessage({ id: 'login.password' })}
+                    rules={[{ required: true, message: formatMessage({ id: 'login.password.required' }) }]}
                 />
 
-                <ProFormCheckbox name="rememberUsername">Remember username</ProFormCheckbox>
+                <ProFormCheckbox name="rememberUsername">
+                    {formatMessage({ id: 'login.rememberUsername' })}
+                </ProFormCheckbox>
             </LoginForm>
         </div>
     );

@@ -1,5 +1,4 @@
 import React from 'react';
-import { ProCard } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table';

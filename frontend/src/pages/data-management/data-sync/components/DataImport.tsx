@@ -1,14 +1,13 @@
 import React from 'react';
-import { ProCard, ProTable } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Form, Upload, Button, Checkbox, Space, message, Row, Col, Steps, Typography, Alert, Spin } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { Form, message, Steps, Upload } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import type { HistoryItem } from './types';
 
-const { Dragger } = Upload;
 const { Step } = Steps;
-const { Text } = Typography;
+import StepSelect from './StepSelect';
+import StepPreview from './StepPreview';
+import StepConfirm from './StepConfirm';
 
 interface Props {
     onImport: (item: HistoryItem) => void;
@@ -109,11 +108,11 @@ function detectTypeFromRows(rows: PreviewRow[], summary: any, fileName?: string)
 
     // Inspect sample values for numeric / currency patterns
     const sampleRows = rows.slice(0, 10);
-    const currencyRe = /^\s*\d{1,3}(?:[\,\d]{0,})?(?:\.\d{1,2})?\s*$/; // simple numeric with optional decimals
+    const currencyRe = /^\s*\d{1,3}(?:[,\d]{0,})?(?:\.\d{1,2})?\s*$/; // simple numeric with optional decimals
     sampleRows.forEach(r => {
         Object.entries(r).forEach(([k, v]) => {
             const key = String(k).toLowerCase();
-            const val = v == null ? '' : String(v).trim();
+            const val = v === null ? '' : String(v).trim();
             if (!val) return;
             if (currencyRe.test(val)) {
                 // numeric-like values could be price/amount; decide by header name
@@ -227,7 +226,7 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
     };
 
     const handleConfirmImport = async () => {
-        const values = await form.validateFields();
+
         const newItem: HistoryItem = {
             key: String(Date.now()),
             importTime: new Date().toISOString().replace('T', ' ').slice(0, 16),
@@ -236,178 +235,18 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
             records: summary ? String(summary.total) : '-',
             status: 'Success',
         };
+
         onImport(newItem);
+
         message.success(formatMessage({ id: 'dataSync.uploadSuccess' }) || 'Import scheduled');
+
         // reset
         setCurrent(0);
         setFile(null);
         setFileMeta(null);
+        
         form.resetFields();
     };
-
-    const step1 = (
-        <ProCard bordered bodyStyle={{ padding: 16 }}>
-            <Row gutter={16}>
-                <Col span={24}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                        <div>
-                            <Text strong>{formatMessage({ id: 'dataSync.selectHint' })}</Text>
-                            {selectedType && <div style={{ marginTop: 8 }}><Text type="secondary">Detected: </Text><Text code>{selectedType}</Text></div>}
-                        </div>
-
-                        <Dragger accept=".xml,.csv" beforeUpload={beforeUpload} fileList={file ? [{ uid: '1', name: file.name, size: file.size }] : []} onRemove={handleRemove} showUploadList={false}>
-                            <div style={{ textAlign: 'center' }}>
-                                {!file ? (
-                                    <InboxOutlined style={{ fontSize: 32, color: '#1890ff' }} />
-                                ) : null}
-                                {!file ? (
-                                    <p className="ant-upload-text">{formatMessage({ id: 'dataSync.uploadHint' })}</p>
-                                ) : (
-                                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 16, paddingLeft: 24 }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, minWidth: 0, flex: '0 0 auto' }}>
-                                            <InboxOutlined style={{ fontSize: 32, color: '#1890ff' }} />
-                                            <div style={{ maxWidth: 520, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }}>
-                                                <Text strong>{file.name}</Text>
-                                            </div>
-                                        </div>
-                                        <div style={{ marginLeft: 16, textAlign: 'left' }}>
-                                            <div><Text type="secondary">{Math.round((file.size / 1024) * 100) / 100} KB</Text></div>
-                                            <div style={{ marginTop: 4 }}>
-                                                <Text type="secondary">{file?.lastModified ? new Date(file.lastModified).toLocaleString() : (fileMeta?.modified ? new Date(fileMeta.modified).toLocaleString() : '')}</Text>
-                                            </div>
-                                            {fileMeta?.hash && (
-                                                <div style={{ marginTop: 8 }}>
-                                                    <Text type="secondary">Hash (SHA-256): </Text>
-                                                    <Text code style={{ wordBreak: 'break-all' }}>{fileMeta.hash}</Text>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </Dragger>
-                    </Space>
-                </Col>
-            </Row>
-            <div style={{ marginTop: 16, textAlign: 'right', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 12 }}>
-                {computingHash && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Spin size="small" />
-                        <Text type="secondary">{formatMessage({ id: 'dataSync.hashing' }) || 'Computing file hash...'}</Text>
-                    </span>
-                )}
-                <Button type="primary" onClick={handleNextToPreview} disabled={computingHash}>{formatMessage({ id: 'dataSync.action.next' }) || 'Next'}</Button>
-            </div>
-        </ProCard>
-    );
-
-    const step2 = (
-        <ProCard bordered bodyStyle={{ padding: 16 }}>
-            {parseError && <Alert type="error" message={parseError} />}
-            {!parseError && summary && (
-                <div>
-                    <div style={{ marginBottom: 12 }}>
-                        <Row gutter={16} style={{ marginTop: 8 }}>
-                            <Col xs={24} md={12}>
-                                <Text strong>Summary:</Text>
-                                <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-                                    <div><Text>Total records: </Text><Text code>{summary.total}</Text></div>
-                                    <div><Text>Record node: </Text><Text code>{summary.recordName}</Text></div>
-                                </div>
-                            </Col>
-                            <Col xs={24} md={12} style={{ textAlign: 'left' }}>
-                                <Text strong style={{ marginRight: 8 }}>Attributes:</Text>
-                                {summary.rootAttrs && Object.keys(summary.rootAttrs).length > 0 && (
-                                    <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap' }}>
-                                        {summary.rootAttrs.start_date && summary.rootAttrs.end_date ? (
-                                            <div style={{ whiteSpace: 'nowrap' }}>
-                                                <Text>start_date: </Text><Text code>{summary.rootAttrs.start_date}</Text>
-                                                <Text style={{ margin: '0 8px' }}>—</Text>
-                                                <Text>end_date: </Text><Text code>{summary.rootAttrs.end_date}</Text>
-                                            </div>
-                                        ) : null}
-                                        {Object.entries(summary.rootAttrs).filter(([k]) => k !== 'start_date' && k !== 'end_date').map(([k, v]) => (
-                                            <div key={k} style={{ whiteSpace: 'nowrap' }}><Text>{k}: </Text><Text code>{v}</Text></div>
-                                        ))}
-                                    </div>
-                                )}
-                            </Col>
-                        </Row>
-                    </div>
-
-                    <div style={{ overflowX: 'auto' }}>
-                        <ProTable<PreviewRow>
-                            rowKey={(r) => JSON.stringify(r).slice(0, 36)}
-                            search={false}
-                            pagination={{ pageSize: 10 }}
-                            dataSource={previewRows}
-                            columns={columns.map(c => ({ title: c.title, dataIndex: c.dataIndex }))}
-                            options={false}
-                            scroll={{ x: 'max-content' }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
-                <Button onClick={() => setCurrent(0)}>{formatMessage({ id: 'dataSync.action.back' }) || 'Back'}</Button>
-                <Button type="primary" onClick={() => setCurrent(2)} disabled={!summary}>{formatMessage({ id: 'dataSync.action.next' }) || 'Next'}</Button>
-            </div>
-        </ProCard>
-    );
-
-    const step3 = (
-        <ProCard bordered bodyStyle={{ padding: 16 }}>
-            <div style={{ marginBottom: 12 }}>
-                <Text strong>Summary (Read-only):</Text>
-                <Row gutter={16} style={{ marginTop: 8 }}>
-                    <Col xs={24} md={12}>
-                        <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-                            <div><Text>Total records: </Text><Text code>{summary?.total ?? '-'}</Text></div>
-                            <div><Text>Record node: </Text><Text code>{summary?.recordName ?? '-'}</Text></div>
-                        </div>
-                    </Col>
-                    <Col xs={24} md={12} style={{ textAlign: 'left' }}>
-                        {summary?.rootAttrs && Object.keys(summary.rootAttrs).length > 0 && (
-                            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap' }}>
-                                <Text strong style={{ marginRight: 8 }}>Attributes:</Text>
-                                {summary.rootAttrs.start_date && summary.rootAttrs.end_date ? (
-                                    <div style={{ whiteSpace: 'nowrap' }}>
-                                        <Text>start_date: </Text><Text code>{summary.rootAttrs.start_date}</Text>
-                                        <Text style={{ margin: '0 8px' }}>—</Text>
-                                        <Text>end_date: </Text><Text code>{summary.rootAttrs.end_date}</Text>
-                                    </div>
-                                ) : null}
-                                {Object.entries(summary.rootAttrs).filter(([k]) => k !== 'start_date' && k !== 'end_date').map(([k, v]) => (
-                                    <div key={k} style={{ whiteSpace: 'nowrap' }}><Text>{k}: </Text><Text code>{v}</Text></div>
-                                ))}
-                            </div>
-                        )}
-                    </Col>
-                </Row>
-                <div style={{ marginTop: 8 }}>
-                    <Alert type="warning" showIcon message={formatMessage({ id: 'dataSync.warning.overwrite' }) || 'Overwrite will replace existing snapshot and cannot be recovered.'} />
-                </div>
-            </div>
-
-            <Form form={form} layout="vertical">
-                <Form.Item name="overwrite" valuePropName="checked">
-                    <Checkbox>{formatMessage({ id: 'dataSync.option.overwrite' })}</Checkbox>
-                </Form.Item>
-                <Form.Item name="dryRun" valuePropName="checked">
-                    <Checkbox>{formatMessage({ id: 'dataSync.option.dryRun' })}</Checkbox>
-                </Form.Item>
-            </Form>
-
-            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
-                <Button onClick={() => setCurrent(1)}>{formatMessage({ id: 'dataSync.action.back' }) || 'Back'}</Button>
-                <Space>
-                    <Button onClick={() => setCurrent(0)}>{formatMessage({ id: 'dataSync.action.modify' }) || 'Back to Modify'}</Button>
-                    <Button type="primary" onClick={handleConfirmImport}>{formatMessage({ id: 'dataSync.action.confirm' }) || 'Confirm Import'}</Button>
-                </Space>
-            </div>
-        </ProCard>
-    );
 
     return (
         <div>
@@ -417,9 +256,34 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
                 <Step title={formatMessage({ id: 'dataSync.step.confirm' }) || 'Confirm'} description={formatMessage({ id: 'dataSync.step.confirm.desc' })} />
             </Steps>
 
-            {current === 0 && step1}
-            {current === 1 && step2}
-            {current === 2 && step3}
+            {current === 0 && (
+                <StepSelect
+                    beforeUpload={beforeUpload}
+                    handleNextToPreview={handleNextToPreview}
+                    handleRemove={handleRemove}
+                    file={file}
+                    fileMeta={fileMeta}
+                    computingHash={computingHash}
+                    selectedType={selectedType}
+                />
+            )}
+            {current === 1 && (
+                <StepPreview
+                    parseError={parseError}
+                    summary={summary}
+                    previewRows={previewRows}
+                    columns={columns}
+                    setCurrent={setCurrent}
+                />
+            )}
+            {current === 2 && (
+                <StepConfirm
+                    summary={summary}
+                    form={form}
+                    handleConfirmImport={handleConfirmImport}
+                    setCurrent={setCurrent}
+                />
+            )}
         </div>
     );
 };

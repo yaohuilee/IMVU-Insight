@@ -1,42 +1,43 @@
 export default {
+  // App
   'app.name': 'IMVU Insight',
   'component.account.logout': '登出',
 
+  // Menu
   'menu.dashboard': '儀表板',
   'menu.dataManagement': '數據管理',
   'menu.dataManagement.dataSync': '數據同步',
   'menu.dataManagement.snapshots': '快照',
   'menu.dataManagement.dataQuality': '數據品質',
   'menu.dataSync': '資料同步',
-
   'menu.businessAnalysis': '業務分析',
   'menu.businessAnalysis.customers.buyers': '買家',
   'menu.businessAnalysis.customers.recipients': '收件方',
   'menu.businessAnalysis.products': '產品',
   'menu.businessAnalysis.sales': '銷售',
-
   'menu.imvuGraph': 'IMVU 圖譜',
   'menu.imvuGraph.users': 'IMVU 用戶',
   'menu.imvuGraph.relations': '用戶關係',
   'menu.imvuGraph.entityExplorer': '實體探索',
-
   'menu.system': '系統',
   'menu.system.about': '關於',
   'menu.system.developers': '開發者',
   'menu.system.settings': '設定',
 
+  // Page Titles
   'system.about.pageTitle': '關於',
   'system.developers.pageTitle': '開發者',
   'system.settings.pageTitle': '系統設定',
-
   'dashboard.pageTitle': '儀表板',
-
   'businessAnalysis.customers.buyers.pageTitle': '買家',
   'businessAnalysis.customers.recipients.pageTitle': '收件方',
   'businessAnalysis.products.pageTitle': '產品',
   'businessAnalysis.sales.pageTitle': '銷售',
-
   'dataSync.pageTitle': '資料同步',
+  'notFound.pageTitle': '找不到頁面',
+  'login.pageTitle': '登入',
+
+  // Data Sync
   'dataSync.uploadTitle': '上傳檔案',
   'dataSync.dataType': '資料類型',
   'dataSync.type.product': 'Product',
@@ -44,10 +45,17 @@ export default {
   'dataSync.uploadLabel': '上傳檔案',
   'dataSync.uploadHint': '點擊或將檔案拖曳到此處以上傳',
   'dataSync.selectHint': '選擇 productlist.xml 或 incomelog.xml',
+  'dataSync.detected': '偵測到：',
   'dataSync.invalidType': '無效的檔案類型，僅允許 .xml 或 .csv',
   'dataSync.fileTooLarge': '檔案過大（最大 5MB）。',
   'dataSync.hashError': '計算檔案雜湊失敗。',
   'dataSync.hashing': '正在計算檔案雜湊...',
+  'dataSync.checkingDuplicate': '檢查是否已有上傳記錄',
+  'dataSync.duplicateDetected': '此檔案似乎已被上傳過',
+  'dataSync.typeLabel': '類型',
+  'dataSync.uploadedAt': '上傳時間',
+  'dataSync.recordCount': '記錄數',
+  'dataSync.fileSize': '檔案大小',
   'dataSync.action.next': '下一步',
   'dataSync.action.back': '上一步',
   'dataSync.action.modify': '返回修改',
@@ -64,7 +72,13 @@ export default {
   'dataSync.action.import': '匯入',
   'dataSync.noFile': '請選擇要上傳的檔案。',
   'dataSync.uploadSuccess': '匯入已加入佇列。',
+  'dataSync.checkFailed': '驗證檔案上傳狀態失敗。',
+  'dataSync.duplicateFile': '此檔案已上傳：類型：{type}；上傳時間：{uploadedAt}；記錄數：{recordCount}；檔案大小：{fileSize}。',
 
+  // Data Sync Table
+  'dataSync.table.uploadedAt': '上傳時間',
+  'dataSync.table.hash': 'Hash',
+  'dataSync.table.fileSize': '檔案大小',
   'dataSync.table.importTime': '匯入時間',
   'dataSync.table.type': '類型',
   'dataSync.table.fileName': '檔案名稱',
@@ -75,19 +89,17 @@ export default {
   'dataSync.table.error': '錯誤',
   'dataSync.tableTitle': '資料同步記錄',
 
-  'notFound.pageTitle': '找不到頁面',
+  // Not Found
   'notFound.subTitle': '抱歉，你造訪的頁面不存在。',
   'notFound.backHome': '回到首頁',
 
-  'login.pageTitle': '登入',
-
+  // Login
   'login.title': 'IMVU Insight',
   'login.subTitle': '使用使用者名稱與密碼登入',
   'login.username': '使用者名稱',
   'login.password': '密碼',
   'login.rememberUsername': '記住使用者名稱',
   'login.submit': '登入',
-
   'login.username.required': '請輸入使用者名稱。',
   'login.password.required': '請輸入密碼。',
 };

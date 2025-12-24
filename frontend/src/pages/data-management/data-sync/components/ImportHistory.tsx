@@ -1,51 +1,101 @@
 import React from 'react';
 import { useIntl } from '@umijs/max';
-import ProTable from '@ant-design/pro-table';
+import ProTable, { ActionType } from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table';
-import type { HistoryItem } from './types';
-import { Space, Tag } from 'antd';
+import { listDataSyncRecords } from '@/services/insight/dataSync';
 
 interface Props {
-    history: HistoryItem[];
+    actionRef?: React.MutableRefObject<ActionType | undefined> | undefined;
 }
 
-const ImportHistory: React.FC<Props> = ({ history }) => {
+const ImportHistory: React.FC<Props> = ({ actionRef }) => {
     const { formatMessage } = useIntl();
 
-    const columns: ProColumns<HistoryItem>[] = [
-        { title: formatMessage({ id: 'dataSync.table.importTime' }), dataIndex: 'importTime' },
-        { title: formatMessage({ id: 'dataSync.table.type' }), dataIndex: 'type' },
-        { title: formatMessage({ id: 'dataSync.table.fileName' }), dataIndex: 'fileName' },
-        { title: formatMessage({ id: 'dataSync.table.records' }), dataIndex: 'records' },
+    // Helper to format file size with thousands separator and appropriate unit
+    const formatFileSize = (size: number): string => {
+        if (isNaN(size) || size === null) return '';
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        let idx = 0;
+        let s = size;
+        while (s >= 1024 && idx < units.length - 1) {
+            s = s / 1024;
+            idx++;
+        }
+        // Use thousands separator for integer part, show up to 2 decimals for non-bytes
+        return idx === 0
+            ? s.toLocaleString() + ' ' + units[idx]
+            : s.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' ' + units[idx];
+    };
+
+    const columns: ProColumns<INSIGHT_API.DataSyncRecordListItem>[] = [
         {
-            title: formatMessage({ id: 'dataSync.table.status' }),
-            dataIndex: 'status',
-            render: (dom: React.ReactNode, entity: HistoryItem) => {
-                const status = entity.status;
-                const color = status === 'Success' ? 'green' : status === 'Partial Failure' ? 'orange' : 'red';
-                return <Tag color={color as any}>{status}</Tag>;
+            title: formatMessage({ id: 'dataSync.table.uploadedAt' }),
+            width: 160,
+            dataIndex: 'uploaded_at',
+            render: (_, row) => {
+                if (!row.uploaded_at) return '';
+                // Assume row.uploaded_at is ISO string in UTC
+                const date = new Date(row.uploaded_at + (row.uploaded_at.endsWith('Z') ? '' : 'Z'));
+                return date.toLocaleString();
             },
         },
         {
-            title: formatMessage({ id: 'dataSync.table.action' }),
-            dataIndex: 'action',
-            render: (_: any, record: HistoryItem) => (
-                <Space>
-                    <a>{formatMessage({ id: 'dataSync.table.view' })}</a>
-                    {record.status !== 'Success' && <a>{formatMessage({ id: 'dataSync.table.error' })}</a>}
-                </Space>
-            ),
+            title: formatMessage({ id: 'dataSync.table.type' }),
+            align: 'center',
+            width: 80,
+            dataIndex: 'type',
+            valueEnum: {
+                income: { text: 'Income' },
+                product: { text: 'Product' },
+            },
+        },
+        {
+            title: formatMessage({ id: 'dataSync.table.fileName' }),
+            dataIndex: 'filename',
+            ellipsis: true,
+        },
+        {
+            title: formatMessage({ id: 'dataSync.table.hash' }),
+            dataIndex: 'hash',
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: formatMessage({ id: 'dataSync.table.records' }),
+            align: 'right',
+            width: 80,
+            dataIndex: 'record_count',
+            render: (_, row) => row.record_count !== null ? row.record_count.toLocaleString() : '',
+        },
+        {
+            title: formatMessage({ id: 'dataSync.table.fileSize' }),
+            align: 'right',
+            width: 80,
+            dataIndex: 'file_size',
+            render: (_, row) => formatFileSize(row.file_size),
         },
     ];
 
     return (
-        <ProTable<HistoryItem>
-            rowKey="key"
+        <ProTable<INSIGHT_API.DataSyncRecordListItem>
+            actionRef={actionRef}
+            rowKey="id"
             columns={columns}
-            dataSource={history}
             search={false}
             options={false}
             pagination={{ pageSize: 10 }}
+            request={async (params) => {
+                const { current = 1, pageSize = 10 } = params;
+                const res = await listDataSyncRecords({ page: current, page_size: pageSize });
+                return {
+                    data: (res.items || []).map((item) => ({
+                        ...item,
+                        key: String(item.id),
+                    })),
+                    total: res.total,
+                    success: true,
+                };
+            }}
         />
     );
 };

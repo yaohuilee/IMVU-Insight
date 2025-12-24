@@ -1,42 +1,43 @@
-  export default {
+export default {
+  // App
   'app.name': 'IMVU Insight',
   'component.account.logout': 'ログアウト',
 
+  // Menu
   'menu.dashboard': 'ダッシュボード',
   'menu.dataManagement': 'データ管理',
   'menu.dataManagement.dataSync': 'データ同期',
   'menu.dataManagement.snapshots': 'スナップショット',
   'menu.dataManagement.dataQuality': 'データ品質',
   'menu.dataSync': 'データ同期',
-
   'menu.businessAnalysis': 'ビジネス分析',
   'menu.businessAnalysis.customers.buyers': 'バイヤー',
   'menu.businessAnalysis.customers.recipients': '受取人',
   'menu.businessAnalysis.products': '製品',
   'menu.businessAnalysis.sales': '売上',
-
   'menu.imvuGraph': 'IMVUグラフ',
   'menu.imvuGraph.users': 'IMVUユーザー',
   'menu.imvuGraph.relations': 'ユーザー関係',
   'menu.imvuGraph.entityExplorer': 'エンティティエクスプローラー',
-
   'menu.system': 'システム',
   'menu.system.about': '概要',
   'menu.system.developers': '開発者',
   'menu.system.settings': '設定',
 
+  // Page Titles
   'system.about.pageTitle': '概要',
   'system.developers.pageTitle': '開発者',
   'system.settings.pageTitle': 'システム設定',
-
   'dashboard.pageTitle': 'ダッシュボード',
-
   'businessAnalysis.customers.buyers.pageTitle': 'バイヤー',
   'businessAnalysis.customers.recipients.pageTitle': '受取人',
   'businessAnalysis.products.pageTitle': '製品',
   'businessAnalysis.sales.pageTitle': '売上',
-
   'dataSync.pageTitle': 'データ同期',
+  'notFound.pageTitle': 'ページが見つかりません',
+  'login.pageTitle': 'サインイン',
+
+  // Data Sync
   'dataSync.uploadTitle': 'ファイルのアップロード',
   'dataSync.dataType': 'データ種類',
   'dataSync.type.product': 'Product',
@@ -44,10 +45,17 @@
   'dataSync.uploadLabel': 'ファイルをアップロード',
   'dataSync.uploadHint': 'クリックまたはここにファイルをドラッグしてアップロード',
   'dataSync.selectHint': 'productlist.xml または incomelog.xml を選択してください',
+  'dataSync.detected': '検出：',
   'dataSync.invalidType': '無効なファイル形式です。許可されているのは .xml と .csv です',
   'dataSync.fileTooLarge': 'ファイルが大きすぎます（最大 5MB）。',
   'dataSync.hashError': 'ファイルハッシュの計算に失敗しました。',
   'dataSync.hashing': 'ファイルハッシュを計算中...',
+  'dataSync.checkingDuplicate': '過去のアップロードを確認しています',
+  'dataSync.duplicateDetected': 'このファイルは既にアップロードされている可能性があります',
+  'dataSync.typeLabel': '種類',
+  'dataSync.uploadedAt': 'アップロード日時',
+  'dataSync.recordCount': 'レコード数',
+  'dataSync.fileSize': 'ファイルサイズ',
   'dataSync.action.next': '次へ',
   'dataSync.action.back': '戻る',
   'dataSync.action.modify': '編集に戻る',
@@ -64,7 +72,13 @@
   'dataSync.action.import': 'インポート',
   'dataSync.noFile': 'アップロードするファイルを選択してください。',
   'dataSync.uploadSuccess': 'インポートがキューに追加されました。',
+  'dataSync.checkFailed': 'ファイルのアップロード状態の確認に失敗しました。',
+  'dataSync.duplicateFile': 'このファイルは既にアップロードされています：種類：{type}；アップロード日時：{uploadedAt}；レコード数：{recordCount}；ファイルサイズ：{fileSize}。',
 
+  // Data Sync Table
+  'dataSync.table.uploadedAt': 'アップロード時間',
+  'dataSync.table.hash': 'Hash',
+  'dataSync.table.fileSize': 'ファイルサイズ',
   'dataSync.table.importTime': 'インポート時間',
   'dataSync.table.type': '種類',
   'dataSync.table.fileName': 'ファイル名',
@@ -75,19 +89,17 @@
   'dataSync.table.error': 'エラー',
   'dataSync.tableTitle': 'データ同期の記録',
 
-  'notFound.pageTitle': 'ページが見つかりません',
+  // Not Found
   'notFound.subTitle': '申し訳ありませんが、アクセスしたページは存在しません。',
   'notFound.backHome': 'ホームへ戻る',
 
-  'login.pageTitle': 'サインイン',
-
+  // Login
   'login.title': 'IMVU Insight',
   'login.subTitle': 'ユーザー名とパスワードでサインインしてください',
   'login.username': 'ユーザー名',
   'login.password': 'パスワード',
   'login.rememberUsername': 'ユーザー名を保存',
   'login.submit': 'サインイン',
-
   'login.username.required': 'ユーザー名を入力してください。',
   'login.password.required': 'パスワードを入力してください。',
 };

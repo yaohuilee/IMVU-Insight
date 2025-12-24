@@ -2,15 +2,15 @@ import React from 'react';
 import { useIntl } from '@umijs/max';
 import { Form, message, Steps, Upload } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import type { HistoryItem } from './types';
 
 const { Step } = Steps;
 import StepSelect from './StepSelect';
 import StepPreview from './StepPreview';
 import StepConfirm from './StepConfirm';
+import { importProductFile, importIncomeFile, getDataSyncRecordByHash } from '@/services/insight/dataSync';
 
 interface Props {
-    onImport: (item: HistoryItem) => void;
+    onImport: () => void;
 }
 
 type PreviewRow = Record<string, any>;
@@ -148,11 +148,11 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
         const name = native.name || '';
         const ext = name.split('.').pop()?.toLowerCase() || '';
         if (!['xml', 'csv'].includes(ext)) {
-            message.error(formatMessage({ id: 'dataSync.invalidType' }) || 'Invalid file type');
+            message.error(formatMessage({ id: 'dataSync.invalidType' }));
             return Upload.LIST_IGNORE;
         }
         if (native.size > MAX_FILE_SIZE) {
-            message.error(formatMessage({ id: 'dataSync.fileTooLarge' }) || 'File too large');
+            message.error(formatMessage({ id: 'dataSync.fileTooLarge' }));
             return Upload.LIST_IGNORE;
         }
         setFile(native);
@@ -172,7 +172,7 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
                 setFileMeta(m => m ? { ...m, hash: h, modified: native.lastModified } : { name: native.name, size: native.size, modified: native.lastModified, hash: h });
             } catch (e) {
                 console.error('hash error', e);
-                message.error(formatMessage({ id: 'dataSync.hashError' }) || 'Failed to compute file hash');
+                message.error(formatMessage({ id: 'dataSync.hashError' }));
             } finally {
                 setComputingHash(false);
             }
@@ -187,11 +187,18 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
         setPreviewRows([]);
         setColumns([]);
         setParseError(null);
+        setSelectedType(null);
     };
 
+    React.useEffect(() => {
+        if (current === 0) {
+            handleRemove();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [current]);
     const handleNextToPreview = async () => {
         if (!file) {
-            message.error(formatMessage({ id: 'dataSync.noFile' }) || 'Please choose a file');
+            message.error(formatMessage({ id: 'dataSync.noFile' }));
             return;
         }
         try {
@@ -226,34 +233,78 @@ const DataImport: React.FC<Props> = ({ onImport }) => {
     };
 
     const handleConfirmImport = async () => {
+        if (!file || !selectedType) {
+            message.error('No file or type selected');
+            return;
+        }
+        // 获取表单参数
+        const values = await form.validateFields();
+        // 在实际上传之前，检查 hash 是否存在已上传的记录
+        try {
+            let hash = fileMeta?.hash;
+            if (!hash) {
+                setComputingHash(true);
+                hash = await computeHash(file);
+                setFileMeta((m) =>
+                    m ? { ...m, hash, modified: file.lastModified } : { name: file.name, size: file.size, modified: file.lastModified, hash },
+                );
+                setComputingHash(false);
+            }
+            if (hash) {
+                const resp = await getDataSyncRecordByHash({ hash });
+                if (resp && (resp as any).exists) {
+                    const record = (resp as any).record as any;
+                    const typeKey = record?.type === 'income' ? 'income' : 'product';
+                    const displayType = formatMessage({ id: `dataSync.type.${typeKey}` });
+                    const uploadedAt = record?.uploaded_at ? new Date(record.uploaded_at).toLocaleString() : '';
+                    const recordCount = record?.record_count ?? '';
+                    const fileSizeBytes = record?.file_size ?? 0;
+                    const fileSize = fileSizeBytes >= 1024 * 1024
+                        ? `${(fileSizeBytes / (1024 * 1024)).toFixed(2)} MB`
+                        : `${(fileSizeBytes / 1024).toFixed(2)} KB`;
+                    message.warning(
+                        formatMessage(
+                            { id: 'dataSync.duplicateFile' },
+                            { type: displayType, uploadedAt, recordCount, fileSize },
+                        ),
+                    );
+                    return;
+                }
+            }
+        } catch (e) {
+            setComputingHash(false);
+            message.error(formatMessage({ id: 'dataSync.checkFailed' }));
+            return;
+        }
+        
+        try {
+            if (selectedType === 'Product') {
+                await importProductFile(values, file);
+            } else if (selectedType === 'Income') {
+                await importIncomeFile(values, file);
+            } else {
+                message.error(formatMessage({ id: 'dataSync.invalidType' }));
+                return;
+            }
 
-        const newItem: HistoryItem = {
-            key: String(Date.now()),
-            importTime: new Date().toISOString().replace('T', ' ').slice(0, 16),
-            type: selectedType || 'Product',
-            fileName: fileMeta?.name || 'upload',
-            records: summary ? String(summary.total) : '-',
-            status: 'Success',
-        };
-
-        onImport(newItem);
-
-        message.success(formatMessage({ id: 'dataSync.uploadSuccess' }) || 'Import scheduled');
-
+            onImport();
+            message.success(formatMessage({ id: 'dataSync.uploadSuccess' }));
+        } catch (e: any) {
+            message.error(e?.message || 'Import failed');
+        }
         // reset
         setCurrent(0);
         setFile(null);
         setFileMeta(null);
-        
         form.resetFields();
     };
 
     return (
         <div>
             <Steps current={current} style={{ marginBottom: 16 }}>
-                <Step title={formatMessage({ id: 'dataSync.step.select' }) || 'Select'} description={formatMessage({ id: 'dataSync.step.select.desc' })} />
-                <Step title={formatMessage({ id: 'dataSync.step.preview' }) || 'Preview'} description={formatMessage({ id: 'dataSync.step.preview.desc' })} />
-                <Step title={formatMessage({ id: 'dataSync.step.confirm' }) || 'Confirm'} description={formatMessage({ id: 'dataSync.step.confirm.desc' })} />
+                <Step title={formatMessage({ id: 'dataSync.step.select' })} description={formatMessage({ id: 'dataSync.step.select.desc' })} />
+                <Step title={formatMessage({ id: 'dataSync.step.preview' })} description={formatMessage({ id: 'dataSync.step.preview.desc' })} />
+                <Step title={formatMessage({ id: 'dataSync.step.confirm' })} description={formatMessage({ id: 'dataSync.step.confirm.desc' })} />
             </Steps>
 
             {current === 0 && (

@@ -1,40 +1,43 @@
 export default {
-		'menu.imvuGraph': 'IMVU Graph',
-		'menu.imvuGraph.users': 'IMVU Users',
-		'menu.imvuGraph.relations': 'User Relations',
-		'menu.imvuGraph.entityExplorer': 'Entity Explorer',
+	// App
 	'app.name': 'IMVU Insight',
 	'component.account.logout': 'Logout',
+
+	// Menu
 	'menu.dashboard': 'Dashboard',
 	'menu.dataManagement': 'Data Management',
 	'menu.dataManagement.dataSync': 'Data Sync',
 	'menu.dataManagement.snapshots': 'Snapshots',
 	'menu.dataManagement.dataQuality': 'Data Quality',
 	'menu.dataSync': 'Data Sync',
-
 	'menu.businessAnalysis': 'Business Analysis',
 	'menu.businessAnalysis.customers.buyers': 'Buyers',
 	'menu.businessAnalysis.customers.recipients': 'Recipients',
 	'menu.businessAnalysis.products': 'Products',
 	'menu.businessAnalysis.sales': 'Sales',
-
+	'menu.imvuGraph': 'IMVU Graph',
+	'menu.imvuGraph.users': 'IMVU Users',
+	'menu.imvuGraph.relations': 'User Relations',
+	'menu.imvuGraph.entityExplorer': 'Entity Explorer',
 	'menu.system': 'System',
 	'menu.system.about': 'About',
 	'menu.system.developers': 'Developers',
 	'menu.system.settings': 'Settings',
 
+	// Page Titles
 	'system.about.pageTitle': 'About',
 	'system.developers.pageTitle': 'Developers',
 	'system.settings.pageTitle': 'System Settings',
-
 	'dashboard.pageTitle': 'Dashboard',
-
 	'businessAnalysis.customers.buyers.pageTitle': 'Buyers',
 	'businessAnalysis.customers.recipients.pageTitle': 'Recipients',
 	'businessAnalysis.products.pageTitle': 'Products',
 	'businessAnalysis.sales.pageTitle': 'Sales',
-
 	'dataSync.pageTitle': 'Data Sync',
+	'notFound.pageTitle': 'Page Not Found',
+	'login.pageTitle': 'Sign In',
+
+	// Data Sync
 	'dataSync.uploadTitle': 'Upload File',
 	'dataSync.dataType': 'Data Type',
 	'dataSync.type.product': 'Product',
@@ -42,10 +45,17 @@ export default {
 	'dataSync.uploadLabel': 'Upload File',
 	'dataSync.uploadHint': 'Click or drag file to this area to upload',
 	'dataSync.selectHint': 'Select productlist.xml or incomelog.xml',
+	'dataSync.detected': 'Detected:',
 	'dataSync.invalidType': 'Invalid file type. Allowed: .xml, .csv',
 	'dataSync.fileTooLarge': 'File too large (max 5MB).',
 	'dataSync.hashError': 'Failed to compute file hash.',
 	'dataSync.hashing': 'Computing file hash...',
+	'dataSync.checkingDuplicate': 'Checking previous uploads',
+	'dataSync.duplicateDetected': 'This file appears to have been uploaded before',
+	'dataSync.typeLabel': 'Type',
+	'dataSync.uploadedAt': 'Uploaded at',
+	'dataSync.recordCount': 'Record count',
+	'dataSync.fileSize': 'File size',
 	'dataSync.action.next': 'Next',
 	'dataSync.action.back': 'Back',
 	'dataSync.action.modify': 'Back to Modify',
@@ -62,7 +72,13 @@ export default {
 	'dataSync.action.import': 'Import',
 	'dataSync.noFile': 'Please select a file to upload.',
 	'dataSync.uploadSuccess': 'Import queued.',
+	'dataSync.checkFailed': 'Failed to verify file upload status.',
+	'dataSync.duplicateFile': 'This file was already uploaded: Type: {type}; Uploaded At: {uploadedAt}; Records: {recordCount}; Size: {fileSize}.',
 
+	// Data Sync Table
+	'dataSync.table.uploadedAt': 'Uploaded At',
+	'dataSync.table.hash': 'Hash',
+	'dataSync.table.fileSize': 'File Size',
 	'dataSync.table.importTime': 'Import Time',
 	'dataSync.table.type': 'Type',
 	'dataSync.table.fileName': 'File Name',
@@ -73,19 +89,17 @@ export default {
 	'dataSync.table.error': 'Error',
 	'dataSync.tableTitle': 'Data Sync Records',
 
-	'notFound.pageTitle': 'Page Not Found',
+	// Not Found
 	'notFound.subTitle': 'Sorry, the page you visited does not exist.',
 	'notFound.backHome': 'Back Home',
 
-	'login.pageTitle': 'Sign In',
-
+	// Login
 	'login.title': 'IMVU Insight',
 	'login.subTitle': 'Sign in with your username and password',
 	'login.username': 'Username',
 	'login.password': 'Password',
 	'login.rememberUsername': 'Remember username',
 	'login.submit': 'Sign in',
-
 	'login.username.required': 'Please enter your username.',
 	'login.password.required': 'Please enter your password.',
 };

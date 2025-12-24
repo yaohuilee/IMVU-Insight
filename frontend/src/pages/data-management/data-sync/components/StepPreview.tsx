@@ -67,8 +67,8 @@ const StepPreview: React.FC<Props> = ({ parseError, summary, previewRows, column
             )}
 
             <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
-                <Button onClick={() => setCurrent(0)}>{formatMessage({ id: 'dataSync.action.back' }) || 'Back'}</Button>
-                <Button type="primary" onClick={() => setCurrent(2)} disabled={!summary}>{formatMessage({ id: 'dataSync.action.next' }) || 'Next'}</Button>
+                <Button onClick={() => setCurrent(0)}>{formatMessage({ id: 'dataSync.action.back' })}</Button>
+                <Button type="primary" onClick={() => setCurrent(2)} disabled={!summary}>{formatMessage({ id: 'dataSync.action.next' })}</Button>
             </div>
         </ProCard>
     );

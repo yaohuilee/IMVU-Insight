@@ -1,41 +1,43 @@
 export default {
+	// App
 	'app.name': 'IMVU Insight',
 	'component.account.logout': '注销',
+
+	// Menu
 	'menu.dashboard': '仪表盘',
 	'menu.dataManagement': '数据管理',
 	'menu.dataManagement.dataSync': '数据同步',
 	'menu.dataManagement.snapshots': '快照',
 	'menu.dataManagement.dataQuality': '数据质量',
 	'menu.dataSync': '数据同步',
-
 	'menu.businessAnalysis': '业务分析',
 	'menu.businessAnalysis.customers.buyers': '买家',
 	'menu.businessAnalysis.customers.recipients': '收件方',
 	'menu.businessAnalysis.products': '产品',
 	'menu.businessAnalysis.sales': '销售',
-
 	'menu.imvuGraph': 'IMVU 图谱',
 	'menu.imvuGraph.users': 'IMVU 用户',
 	'menu.imvuGraph.relations': '用户关系',
 	'menu.imvuGraph.entityExplorer': '实体探索',
-
 	'menu.system': '系统',
 	'menu.system.about': '关于',
 	'menu.system.developers': '开发者',
 	'menu.system.settings': '设置',
 
+	// Page Titles
 	'system.about.pageTitle': '关于',
 	'system.developers.pageTitle': '开发者',
 	'system.settings.pageTitle': '系统设置',
-
 	'dashboard.pageTitle': '仪表盘',
-
 	'businessAnalysis.customers.buyers.pageTitle': '买家',
 	'businessAnalysis.customers.recipients.pageTitle': '收件方',
 	'businessAnalysis.products.pageTitle': '产品',
 	'businessAnalysis.sales.pageTitle': '销售',
-
 	'dataSync.pageTitle': '数据同步',
+	'notFound.pageTitle': '页面不存在',
+	'login.pageTitle': '登录',
+
+	// Data Sync
 	'dataSync.uploadTitle': '上传文件',
 	'dataSync.dataType': '数据类型',
 	'dataSync.type.product': 'Product',
@@ -43,10 +45,17 @@ export default {
 	'dataSync.uploadLabel': '上传文件',
 	'dataSync.uploadHint': '点击或将文件拖到此处上传',
 	'dataSync.selectHint': '选择 productlist.xml 或者 incomelog.xml',
+	'dataSync.detected': '检测到：',
 	'dataSync.invalidType': '无效的文件类型，仅允许 .xml 或 .csv',
 	'dataSync.fileTooLarge': '文件过大（最大 5MB）。',
 	'dataSync.hashError': '计算文件哈希失败。',
 	'dataSync.hashing': '正在计算文件哈希...',
+	'dataSync.checkingDuplicate': '检查是否已有上传记录',
+	'dataSync.duplicateDetected': '该文件似乎已被上传过',
+	'dataSync.typeLabel': '类型',
+	'dataSync.uploadedAt': '上传时间',
+	'dataSync.recordCount': '记录数',
+	'dataSync.fileSize': '文件大小',
 	'dataSync.action.next': '下一步',
 	'dataSync.action.back': '上一步',
 	'dataSync.action.modify': '返回修改',
@@ -63,7 +72,13 @@ export default {
 	'dataSync.action.import': '导入',
 	'dataSync.noFile': '请选择要上传的文件。',
 	'dataSync.uploadSuccess': '导入已加入队列。',
+	'dataSync.checkFailed': '校验文件上传状态失败。',
+	'dataSync.duplicateFile': '该文件已上传：类型：{type}；上传时间：{uploadedAt}；记录数：{recordCount}；文件大小：{fileSize}。',
 
+	// Data Sync Table
+	'dataSync.table.uploadedAt': '上传时间',
+	'dataSync.table.hash': 'Hash',
+	'dataSync.table.fileSize': '文件大小',
 	'dataSync.table.importTime': '导入时间',
 	'dataSync.table.type': '类型',
 	'dataSync.table.fileName': '文件名',
@@ -74,19 +89,17 @@ export default {
 	'dataSync.table.error': '错误',
 	'dataSync.tableTitle': '数据同步记录',
 
-	'notFound.pageTitle': '页面不存在',
+	// Not Found
 	'notFound.subTitle': '抱歉，你访问的页面不存在。',
 	'notFound.backHome': '返回首页',
 
-	'login.pageTitle': '登录',
-
+	// Login
 	'login.title': 'IMVU Insight',
 	'login.subTitle': '使用用户名和密码登录',
 	'login.username': '用户名',
 	'login.password': '密码',
 	'login.rememberUsername': '记住用户名',
 	'login.submit': '登录',
-
 	'login.username.required': '请输入用户名。',
 	'login.password.required': '请输入密码。',
 };

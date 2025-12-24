@@ -45,7 +45,7 @@ const StepConfirm: React.FC<Props> = ({ summary, form, handleConfirmImport, setC
                     </Col>
                 </Row>
                 <div style={{ marginTop: 8 }}>
-                    <Alert type="warning" showIcon message={formatMessage({ id: 'dataSync.warning.overwrite' }) || 'Overwrite will replace existing snapshot and cannot be recovered.'} />
+                    <Alert type="warning" showIcon message={formatMessage({ id: 'dataSync.warning.overwrite' })} />
                 </div>
             </div>
 
@@ -59,10 +59,10 @@ const StepConfirm: React.FC<Props> = ({ summary, form, handleConfirmImport, setC
             </Form>
 
             <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
-                <Button onClick={() => setCurrent(1)}>{formatMessage({ id: 'dataSync.action.back' }) || 'Back'}</Button>
+                <Button onClick={() => setCurrent(1)}>{formatMessage({ id: 'dataSync.action.back' })}</Button>
                 <Space>
-                    <Button onClick={() => setCurrent(0)}>{formatMessage({ id: 'dataSync.action.modify' }) || 'Back to Modify'}</Button>
-                    <Button type="primary" onClick={handleConfirmImport}>{formatMessage({ id: 'dataSync.action.confirm' }) || 'Confirm Import'}</Button>
+                    <Button onClick={() => setCurrent(0)}>{formatMessage({ id: 'dataSync.action.modify' })}</Button>
+                    <Button type="primary" onClick={handleConfirmImport}>{formatMessage({ id: 'dataSync.action.confirm' })}</Button>
                 </Space>
             </div>
         </ProCard>

@@ -9,9 +9,12 @@ dependencies = [
 	"uvicorn[standard]>=0.34.0",
 	"pyyaml>=6.0.2",
 
+	"apscheduler>=3.11.0",
+
 	# Data processing
 	"pandas>=2.2.3",
 	"lxml>=5.3.0",
+	"python-multipart>=0.0.6",
 
 	# Database (MySQL)
 	"sqlalchemy[asyncio]>=2.0.36",

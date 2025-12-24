@@ -1,0 +1,13 @@
+from __future__ import annotations
+
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+# Import model classes here so other modules can import from `app.models`
+from .data_sync import DataSyncRecord  # noqa: F401
+
+__all__ = ["DataSyncRecord"]

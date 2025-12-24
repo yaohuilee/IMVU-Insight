@@ -1,5 +1,6 @@
 # --- Project data (keep large/raw data out of git) ---
 /data/
+/backend/data/
 
 # --- Python / FastAPI ---
 __pycache__/

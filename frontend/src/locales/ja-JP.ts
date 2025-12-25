@@ -32,6 +32,16 @@ export default {
   'businessAnalysis.customers.buyers.pageTitle': 'バイヤー',
   'businessAnalysis.customers.recipients.pageTitle': '受取人',
   'businessAnalysis.products.pageTitle': '製品',
+
+  // Business Analysis - Products table
+  'businessAnalysis.products.columns.id': 'ID',
+  'businessAnalysis.products.columns.name': '名前',
+  'businessAnalysis.products.columns.visible': '表示',
+  'businessAnalysis.products.columns.price': '価格',
+  'businessAnalysis.products.columns.firstSold': '初回販売',
+  'businessAnalysis.products.columns.lastSold': '最終販売',
+  'businessAnalysis.products.columns.action': '操作',
+  'businessAnalysis.products.action.detail': '詳細',
   'businessAnalysis.sales.pageTitle': '売上',
   'dataSync.pageTitle': 'データ同期',
   'notFound.pageTitle': 'ページが見つかりません',

@@ -32,6 +32,16 @@ export default {
   'businessAnalysis.customers.buyers.pageTitle': '買家',
   'businessAnalysis.customers.recipients.pageTitle': '收件方',
   'businessAnalysis.products.pageTitle': '產品',
+
+  // Business Analysis - Products table
+  'businessAnalysis.products.columns.id': 'ID',
+  'businessAnalysis.products.columns.name': '名稱',
+  'businessAnalysis.products.columns.visible': '可見',
+  'businessAnalysis.products.columns.price': '價格',
+  'businessAnalysis.products.columns.firstSold': '首次售出',
+  'businessAnalysis.products.columns.lastSold': '最後售出',
+  'businessAnalysis.products.columns.action': '操作',
+  'businessAnalysis.products.action.detail': '詳情',
   'businessAnalysis.sales.pageTitle': '銷售',
   'dataSync.pageTitle': '資料同步',
   'notFound.pageTitle': '找不到頁面',

@@ -32,6 +32,16 @@ export default {
 	'businessAnalysis.customers.buyers.pageTitle': '买家',
 	'businessAnalysis.customers.recipients.pageTitle': '收件方',
 	'businessAnalysis.products.pageTitle': '产品',
+
+	// Business Analysis - Products table
+	'businessAnalysis.products.columns.id': 'ID',
+	'businessAnalysis.products.columns.name': '名称',
+	'businessAnalysis.products.columns.visible': '可见',
+	'businessAnalysis.products.columns.price': '价格',
+	'businessAnalysis.products.columns.firstSold': '首次售出',
+	'businessAnalysis.products.columns.lastSold': '最后售出',
+	'businessAnalysis.products.columns.action': '操作',
+	'businessAnalysis.products.action.detail': '详情',
 	'businessAnalysis.sales.pageTitle': '销售',
 	'dataSync.pageTitle': '数据同步',
 	'notFound.pageTitle': '页面不存在',

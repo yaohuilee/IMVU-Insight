@@ -32,6 +32,16 @@ export default {
 	'businessAnalysis.customers.buyers.pageTitle': 'Buyers',
 	'businessAnalysis.customers.recipients.pageTitle': 'Recipients',
 	'businessAnalysis.products.pageTitle': 'Products',
+
+	// Business Analysis - Products table
+	'businessAnalysis.products.columns.id': 'ID',
+	'businessAnalysis.products.columns.name': 'Name',
+	'businessAnalysis.products.columns.visible': 'Visible',
+	'businessAnalysis.products.columns.price': 'Price',
+	'businessAnalysis.products.columns.firstSold': 'First Sold',
+	'businessAnalysis.products.columns.lastSold': 'Last Sold',
+	'businessAnalysis.products.columns.action': 'Action',
+	'businessAnalysis.products.action.detail': 'Detail',
 	'businessAnalysis.sales.pageTitle': 'Sales',
 	'dataSync.pageTitle': 'Data Sync',
 	'notFound.pageTitle': 'Page Not Found',

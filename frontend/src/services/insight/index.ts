@@ -5,10 +5,12 @@
 import * as dataSync from './dataSync';
 import * as health from './health';
 import * as healthDb from './healthDb';
+import * as product from './product';
 import * as root from './root';
 export default {
   root,
   health,
   healthDb,
   dataSync,
+  product,
 };

@@ -14,6 +14,8 @@ declare namespace INSIGHT_API {
     id: number;
     /** Filename */
     filename: string;
+    /** Imported Count */
+    imported_count?: number | null;
   };
 
   type DataSyncRecordByHashResponse = {
@@ -73,6 +75,37 @@ declare namespace INSIGHT_API {
     page_size?: number;
     /** Filter by data type */
     type?: DataType | null;
+  };
+
+  type listProductsParams = {
+    page?: number;
+    page_size?: number;
+  };
+
+  type PaginatedProductResponse = {
+    /** Total */
+    total: number;
+    /** Page */
+    page: number;
+    /** Page Size */
+    page_size: number;
+    /** Items */
+    items: ProductSummary[];
+  };
+
+  type ProductSummary = {
+    /** Product Id */
+    product_id: number;
+    /** Product Name */
+    product_name: string;
+    /** Visible */
+    visible: boolean;
+    /** Price */
+    price: string;
+    /** First Sold At */
+    first_sold_at?: string | null;
+    /** Last Sold At */
+    last_sold_at?: string | null;
   };
 
   type ValidationError = {

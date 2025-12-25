@@ -9,5 +9,7 @@ class Base(DeclarativeBase):
 
 # Import model classes here so other modules can import from `app.models`
 from .data_sync import DataSyncRecord  # noqa: F401
+from .raw_product_list import RawProductList  # noqa: F401
+from .raw_income_log import RawIncomeLog  # noqa: F401
 
-__all__ = ["DataSyncRecord"]
+__all__ = ["DataSyncRecord", "RawProductList", "RawIncomeLog"]

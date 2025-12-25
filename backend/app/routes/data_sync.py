@@ -12,7 +12,10 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, UploadFile, File, Query, HTTPException
 from pydantic import BaseModel
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
+import xml.etree.ElementTree as ET
+from datetime import date
 
 from app.core.db import get_db_session
 from app.models.data_sync import DataType
@@ -20,12 +23,15 @@ from app.services import DataSyncService
 
 router = APIRouter(prefix="/data-sync", tags=["DataSync"])
 
+logger = logging.getLogger(__name__)
+
 
 class DataSyncCreateResponse(BaseModel):
     """Response returned after successfully creating a DataSyncRecord."""
 
     id: int
     filename: str
+    imported_count: int | None = None
 
 
 class DataSyncRecordListItem(BaseModel):
@@ -130,7 +136,7 @@ async def _handle_upload(session: AsyncSession, file: UploadFile, dtype: DataTyp
         content=content,
     )
 
-    return record
+    return record, content
 
 
 @router.post(
@@ -145,8 +151,45 @@ async def import_product_file(
 ):
     """Upload a product file and create a data sync record."""
 
-    record = await _handle_upload(session, file, DataType.PRODUCT)
-    return DataSyncCreateResponse(id=int(record.id), filename=record.filename)
+    record, content = await _handle_upload(session, file, DataType.PRODUCT)
+
+    # parse XML and insert raw product rows; return number of imported rows
+    imported_count: int | None = None
+    try:
+        root = ET.fromstring(content)
+        entries = []
+        for el in root.findall(".//product_list_entry"):
+            entries.append({
+                "product_id": int(el.get("product_id")) if el.get("product_id") else None,
+                "product_name": el.get("product_name", ""),
+                "price": el.get("price", ""),
+                "profit": el.get("profit", ""),
+                "visible": el.get("visible", ""),
+                "old_sales": el.get("old_sales", ""),
+                "new_sales": el.get("new_sales", ""),
+                "total_sales": el.get("total_sales", ""),
+                "derived_product_sales": el.get("derived_product_sales", ""),
+                "direct_sales": el.get("direct_sales", ""),
+                "indirect_sales": el.get("indirect_sales", ""),
+                "promoted_sales": el.get("promoted_sales", ""),
+                "cart_adds": el.get("cart_adds", ""),
+                "wishlist_adds": el.get("wishlist_adds", ""),
+                "organic_impressions": el.get("organic_impressions", ""),
+                "paid_impressions": el.get("paid_impressions", ""),
+            })
+
+        svc2 = DataSyncService(session)
+        snapshot = getattr(record, "uploaded_at", None)
+        snapshot_date = snapshot.date() if snapshot is not None else date.today()
+        imported_count = await svc2.add_raw_product_list(sync_record_id=int(record.id), snapshot_date=snapshot_date, records=entries)
+    except ET.ParseError as exc:
+        logger.exception("Failed to parse product XML for DataSyncRecord id=%s: %s", getattr(record, "id", None), exc)
+        imported_count = 0
+    except Exception as exc:  # pragma: no cover - unexpected errors
+        logger.exception("Unexpected error while importing product XML for DataSyncRecord id=%s", getattr(record, "id", None))
+        imported_count = 0
+
+    return DataSyncCreateResponse(id=int(record.id), filename=record.filename, imported_count=imported_count)
 
 
 @router.post(
@@ -161,8 +204,52 @@ async def import_income_file(
 ):
     """Upload an income file and create a data sync record."""
 
-    record = await _handle_upload(session, file, DataType.INCOME)
-    return DataSyncCreateResponse(id=int(record.id), filename=record.filename)
+    record, content = await _handle_upload(session, file, DataType.INCOME)
+
+    # parse XML and insert raw income rows; return number of imported rows
+    imported_count: int | None = None
+    try:
+        root = ET.fromstring(content)
+        entries = []
+        for el in root.findall(".//developer_income_entry"):
+            # parse purchase_date into datetime; fallback to now if missing
+            pd_raw = el.get("purchase_date")
+            try:
+                purchase_dt = datetime.fromisoformat(pd_raw) if pd_raw else datetime.utcnow()
+            except Exception:
+                purchase_dt = datetime.utcnow()
+
+            entries.append({
+                "sales_log_id": int(el.get("sales_log_id")) if el.get("sales_log_id") else None,
+                "buyer_id": int(el.get("buyer_id")) if el.get("buyer_id") else None,
+                "buyer_name": el.get("buyer_name", ""),
+                "recipient_id": int(el.get("recipient_id")) if el.get("recipient_id") else None,
+                "recipient_name": el.get("recipient_name", ""),
+                "reseller_id": el.get("reseller_id", ""),
+                "reseller_name": el.get("reseller_name", ""),
+                "product_id": int(el.get("product_id")) if el.get("product_id") else None,
+                "product_name": el.get("product_name", ""),
+                "price_factor": el.get("price_factor", ""),
+                "paid_credits": el.get("paid_credits", ""),
+                "paid_promo_credits": el.get("paid_promo_credits", ""),
+                "income_credits": el.get("income_credits", ""),
+                "income_promo_credits": el.get("income_promo_credits", ""),
+                "purchase_date": purchase_dt,
+                "credit_delivery_date": el.get("credit_delivery_date", ""),
+            })
+
+        svc2 = DataSyncService(session)
+        snapshot = getattr(record, "uploaded_at", None)
+        snapshot_date = snapshot.date() if snapshot is not None else date.today()
+        imported_count = await svc2.add_raw_income_log(sync_record_id=int(record.id), snapshot_date=snapshot_date, records=entries)
+    except ET.ParseError as exc:
+        logger.exception("Failed to parse income XML for DataSyncRecord id=%s: %s", getattr(record, "id", None), exc)
+        imported_count = 0
+    except Exception as exc:  # pragma: no cover - unexpected errors
+        logger.exception("Unexpected error while importing income XML for DataSyncRecord id=%s", getattr(record, "id", None))
+        imported_count = 0
+
+    return DataSyncCreateResponse(id=int(record.id), filename=record.filename, imported_count=imported_count)
 
 
 @router.get(
@@ -216,6 +303,14 @@ async def delete_data_sync_record(
     """
 
     svc = DataSyncService(session)
+    # remove any raw rows associated with this sync record first
+    try:
+        raw_deleted = await svc.delete_raw_by_sync_record(id)
+        income_deleted = await svc.delete_raw_income_by_sync_record(id)
+        logger.info("Deleted raw rows for DataSyncRecord id=%s: raw=%s, income=%s", id, raw_deleted, income_deleted)
+    except Exception:  # pragma: no cover - best-effort cleanup, do not block final deletion
+        logger.exception("Failed to delete raw rows for DataSyncRecord id=%s", id)
+
     deleted = await svc.delete(id)
     if not deleted:
         return {"deleted": False, "message": "Object is not existed"}

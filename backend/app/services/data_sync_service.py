@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple, List
 
-from sqlalchemy import select, func
+from datetime import date
+
+from sqlalchemy import select, func, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.data_sync import DataSyncRecord, DataType
+from app.models.raw_product_list import RawProductList
+from app.models.raw_income_log import RawIncomeLog
 
 
 class DataSyncService:
@@ -76,4 +80,98 @@ class DataSyncService:
         page_res = await self.session.execute(base_q.offset(offset).limit(page_size))
         records = page_res.scalars().all()
         return records, total
+
+    async def add_raw_product_list(self, *, sync_record_id: int, snapshot_date: date, records: Sequence[dict]) -> int:
+        """Bulk insert raw product list rows for a given sync record and snapshot date.
+
+        `records` should be an iterable of dicts with keys matching the XML fields:
+        product_id, product_name, price, profit, visible, old_sales, new_sales,
+        total_sales, derived_product_sales, direct_sales, indirect_sales,
+        promoted_sales, cart_adds, wishlist_adds, organic_impressions, paid_impressions
+        """
+        objs: List[RawProductList] = []
+        for r in records:
+            obj = RawProductList(
+                sync_record_id=sync_record_id,
+                snapshot_date=snapshot_date,
+                product_id=r.get("product_id"),
+                product_name=r.get("product_name", ""),
+                price=r.get("price", ""),
+                profit=r.get("profit", ""),
+                visible=r.get("visible", ""),
+                old_sales=r.get("old_sales", ""),
+                new_sales=r.get("new_sales", ""),
+                total_sales=r.get("total_sales", ""),
+                derived_product_sales=r.get("derived_product_sales", ""),
+                direct_sales=r.get("direct_sales", ""),
+                indirect_sales=r.get("indirect_sales", ""),
+                promoted_sales=r.get("promoted_sales", ""),
+                cart_adds=r.get("cart_adds", ""),
+                wishlist_adds=r.get("wishlist_adds", ""),
+                organic_impressions=r.get("organic_impressions", ""),
+                paid_impressions=r.get("paid_impressions", ""),
+            )
+            objs.append(obj)
+
+        if not objs:
+            return 0
+
+        self.session.add_all(objs)
+        await self.session.commit()
+        return len(objs)
+
+    async def delete_raw_by_sync_record(self, sync_record_id: int) -> int:
+        """Delete raw_product_list rows by sync_record_id. Returns number of rows deleted."""
+        stmt = delete(RawProductList).where(RawProductList.sync_record_id == sync_record_id)
+        res = await self.session.execute(stmt)
+        await self.session.commit()
+        # rowcount may be None in some backends; coerce to int
+        return int(res.rowcount or 0)
+
+    async def add_raw_income_log(self, *, sync_record_id: int, snapshot_date: date, records: Sequence[dict]) -> int:
+        """Bulk insert raw income log rows for a given sync record and snapshot date.
+
+        `records` should be an iterable of dicts with keys matching the XML fields:
+        sales_log_id, buyer_id, buyer_name, recipient_id, recipient_name,
+        reseller_id, reseller_name, product_id, product_name, price_factor,
+        paid_credits, paid_promo_credits, income_credits, income_promo_credits,
+        purchase_date (datetime), credit_delivery_date
+        """
+        objs: List[RawIncomeLog] = []
+        for r in records:
+            obj = RawIncomeLog(
+                sync_record_id=sync_record_id,
+                snapshot_date=snapshot_date,
+                sales_log_id=r.get("sales_log_id"),
+                buyer_id=r.get("buyer_id"),
+                buyer_name=r.get("buyer_name", ""),
+                recipient_id=r.get("recipient_id"),
+                recipient_name=r.get("recipient_name", ""),
+                reseller_id=r.get("reseller_id", ""),
+                reseller_name=r.get("reseller_name", ""),
+                product_id=r.get("product_id"),
+                product_name=r.get("product_name", ""),
+                price_factor=r.get("price_factor", ""),
+                paid_credits=r.get("paid_credits", ""),
+                paid_promo_credits=r.get("paid_promo_credits", ""),
+                income_credits=r.get("income_credits", ""),
+                income_promo_credits=r.get("income_promo_credits", ""),
+                purchase_date=r.get("purchase_date"),
+                credit_delivery_date=r.get("credit_delivery_date", ""),
+            )
+            objs.append(obj)
+
+        if not objs:
+            return 0
+
+        self.session.add_all(objs)
+        await self.session.commit()
+        return len(objs)
+
+    async def delete_raw_income_by_sync_record(self, sync_record_id: int) -> int:
+        """Delete raw_income_log rows by sync_record_id. Returns number of rows deleted."""
+        stmt = delete(RawIncomeLog).where(RawIncomeLog.sync_record_id == sync_record_id)
+        res = await self.session.execute(stmt)
+        await self.session.commit()
+        return int(res.rowcount or 0)
 

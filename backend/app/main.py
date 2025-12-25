@@ -11,6 +11,7 @@ from app.core.config import get_settings
 from app.core.db import check_db_connection, get_db_session
 from app.routes.data_sync import router as data_sync_router
 from app.routes.product import router as product_router
+from app.routes.imvu_user import router as imvu_user_router
 
 
 settings = get_settings()
@@ -68,3 +69,4 @@ async def health_db(session: AsyncSession = Depends(get_db_session)) -> dict:
 app.include_router(router)
 app.include_router(data_sync_router)
 app.include_router(product_router)
+app.include_router(imvu_user_router)

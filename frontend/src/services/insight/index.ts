@@ -5,6 +5,7 @@
 import * as dataSync from './dataSync';
 import * as health from './health';
 import * as healthDb from './healthDb';
+import * as imvuUser from './imvuUser';
 import * as product from './product';
 import * as root from './root';
 export default {
@@ -13,4 +14,5 @@ export default {
   healthDb,
   dataSync,
   product,
+  imvuUser,
 };

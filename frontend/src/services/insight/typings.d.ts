@@ -68,6 +68,17 @@ declare namespace INSIGHT_API {
     detail?: ValidationError[];
   };
 
+  type ImvuUserSummary = {
+    /** Id */
+    id: number;
+    /** Name */
+    name?: string | null;
+    /** First Seen */
+    first_seen: string;
+    /** Last Seen */
+    last_seen: string;
+  };
+
   type listDataSyncRecordsParams = {
     /** Page number */
     page?: number;
@@ -77,9 +88,25 @@ declare namespace INSIGHT_API {
     type?: DataType | null;
   };
 
+  type listImvuUsersParams = {
+    page?: number;
+    page_size?: number;
+  };
+
   type listProductsParams = {
     page?: number;
     page_size?: number;
+  };
+
+  type PaginatedImvuUserResponse = {
+    /** Total */
+    total: number;
+    /** Page */
+    page: number;
+    /** Page Size */
+    page_size: number;
+    /** Items */
+    items: ImvuUserSummary[];
   };
 
   type PaginatedProductResponse = {

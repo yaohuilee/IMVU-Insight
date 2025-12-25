@@ -10,6 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.data_sync import DataSyncRecord, DataType
 from app.models.raw_product_list import RawProductList
 from app.models.raw_income_log import RawIncomeLog
+from app.models.product import Product
+from app.models.developer import Developer
+from app.models.imvu_user import ImvuUser
+from decimal import Decimal, InvalidOperation
+from datetime import datetime, time
 
 
 class DataSyncService:
@@ -119,7 +124,99 @@ class DataSyncService:
 
         self.session.add_all(objs)
         await self.session.commit()
+
+        # After inserting raw rows, ensure developer/imvu_user and product records.
+        try:
+            developer_ids = {r.get("developer_id") for r in records if r.get("developer_id") is not None}
+            product_ids = {r.get("product_id") for r in records if r.get("product_id") is not None}
+
+            await self._ensure_developers_and_users(developer_ids=developer_ids, snapshot_date=snapshot_date)
+            await self._upsert_products(product_ids=product_ids, records=records)
+
+            # Commit any created/updated developer/user/product rows
+            await self.session.commit()
+        except Exception:
+            # best-effort: log/ignore here; do not fail the raw insertion
+            await self.session.rollback()
+
         return len(objs)
+
+    async def _ensure_developers_and_users(self, *, developer_ids: set, snapshot_date: date) -> None:
+        """Ensure Developer and ImvuUser rows exist for given developer IDs.
+
+        Adds missing objects to the current session but does not commit.
+        """
+        if not developer_ids:
+            return
+
+        stmt = select(Developer).where(Developer.developer_user_id.in_(developer_ids))
+        res = await self.session.execute(stmt)
+        existing_devs = {d.developer_user_id for d in res.scalars().all()}
+        to_create_devs = [
+            Developer(developer_user_id=did, first_seen_at=snapshot_date, last_seen_at=snapshot_date)
+            for did in developer_ids
+            if did not in existing_devs
+        ]
+        if to_create_devs:
+            self.session.add_all(to_create_devs)
+
+        # Create missing ImvuUser rows for the same IDs
+        stmt2 = select(ImvuUser).where(ImvuUser.user_id.in_(developer_ids))
+        res2 = await self.session.execute(stmt2)
+        existing_users = {u.user_id for u in res2.scalars().all()}
+        snapshot_dt = datetime.combine(snapshot_date, time.min)
+        to_create_users = [
+            ImvuUser(user_id=did, user_name=None, first_seen_at=snapshot_dt, last_seen_at=snapshot_dt)
+            for did in developer_ids
+            if did not in existing_users
+        ]
+        if to_create_users:
+            self.session.add_all(to_create_users)
+
+    async def _upsert_products(self, *, product_ids: set, records: Sequence[dict]) -> None:
+        """Upsert Product rows from raw records. Adds new products or updates existing ones.
+
+        Adds objects to the current session but does not commit.
+        """
+        if not product_ids:
+            return
+
+        resp = await self.session.execute(select(Product).where(Product.product_id.in_(product_ids)))
+        existing_products = {p.product_id: p for p in resp.scalars().all()}
+
+        for r in records:
+            pid = r.get("product_id")
+            if pid is None:
+                continue
+
+            name = r.get("product_name", "")
+            price_raw = r.get("price", "")
+            try:
+                price_val = Decimal(price_raw)
+            except (InvalidOperation, TypeError):
+                try:
+                    price_val = Decimal(str(float(price_raw)))
+                except Exception:
+                    price_val = Decimal("0.00")
+
+            vis_raw = r.get("visible", "")
+            visible_bool = str(vis_raw).lower() in ("1", "true", "yes", "y", "t")
+
+            if pid in existing_products:
+                prod = existing_products[pid]
+                prod.developer_user_id = r.get("developer_id") or prod.developer_user_id
+                prod.product_name = name or prod.product_name
+                prod.price = price_val
+                prod.visible = visible_bool
+            else:
+                prod = Product(
+                    product_id=pid,
+                    developer_user_id=r.get("developer_id") or 0,
+                    product_name=name,
+                    price=price_val,
+                    visible=visible_bool,
+                )
+                self.session.add(prod)
 
     async def delete_raw_by_sync_record(self, sync_record_id: int) -> int:
         """Delete raw_product_list rows by sync_record_id. Returns number of rows deleted."""

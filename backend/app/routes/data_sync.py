@@ -198,3 +198,26 @@ async def get_data_sync_record_by_hash(
     )
 
     return {"exists": True, "record": item}
+
+
+@router.delete(
+    "/object",
+    operation_id="deleteDataSyncRecord",
+    summary="Delete a DataSyncRecord by ID",
+)
+async def delete_data_sync_record(
+    id: int = Query(..., description="ID of the DataSyncRecord to delete"),
+    session: AsyncSession = Depends(get_db_session),
+):
+    """Delete a DataSyncRecord by its ID and return deletion result.
+
+    Returns HTTP 200 with `{ "deleted": true }` on success, or
+    HTTP 404 when the record does not exist.
+    """
+
+    svc = DataSyncService(session)
+    deleted = await svc.delete(id)
+    if not deleted:
+        return {"deleted": False, "message": "Object is not existed"}
+
+    return {"deleted": True}

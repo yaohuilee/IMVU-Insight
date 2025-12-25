@@ -51,6 +51,11 @@ declare namespace INSIGHT_API {
 
   type DataType = 'income' | 'product';
 
+  type deleteDataSyncRecordParams = {
+    /** ID of the DataSyncRecord to delete */
+    id: number;
+  };
+
   type getDataSyncRecordByHashParams = {
     /** File hash to check */
     hash: string;

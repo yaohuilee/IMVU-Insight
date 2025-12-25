@@ -49,7 +49,7 @@ const StepConfirm: React.FC<Props> = ({ summary, form, handleConfirmImport, setC
                 </div>
             </div>
 
-            <Form form={form} layout="vertical">
+            <Form form={form} layout="vertical" disabled>
                 <Form.Item name="overwrite" valuePropName="checked">
                     <Checkbox>{formatMessage({ id: 'dataSync.option.overwrite' })}</Checkbox>
                 </Form.Item>

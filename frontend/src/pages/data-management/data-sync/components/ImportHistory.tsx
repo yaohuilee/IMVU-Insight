@@ -2,7 +2,8 @@ import React from 'react';
 import { useIntl } from '@umijs/max';
 import ProTable, { ActionType } from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table';
-import { listDataSyncRecords } from '@/services/insight/dataSync';
+import { Popconfirm, message } from 'antd';
+import { listDataSyncRecords, deleteDataSyncRecord } from '@/services/insight/dataSync';
 
 interface Props {
     actionRef?: React.MutableRefObject<ActionType | undefined> | undefined;
@@ -73,6 +74,36 @@ const ImportHistory: React.FC<Props> = ({ actionRef }) => {
             width: 80,
             dataIndex: 'file_size',
             render: (_, row) => formatFileSize(row.file_size),
+        },
+        {
+            title: formatMessage({ id: 'dataSync.table.action' }),
+            align: 'center',
+            width: 80,
+            fixed: 'right',
+            valueType: 'option',
+            render: (_, row) => (
+                <Popconfirm
+                    title={formatMessage({ id: 'dataSync.table.deleteConfirm' })}
+                    onConfirm={async () => {
+                        try {
+                            const res = await deleteDataSyncRecord({ id: row.id });
+                            if (res && res.deleted) {
+                                message.success(formatMessage({ id: 'dataSync.table.deleteSuccess' }));
+                                actionRef?.current?.reload();
+                            } else {
+                                message.info(res?.message || formatMessage({ id: 'dataSync.table.deleteNotExist' }));
+                                actionRef?.current?.reload();
+                            }
+                        } catch (err) {
+                            message.error(formatMessage({ id: 'dataSync.table.deleteFailed' }));
+                        }
+                    }}
+                    okText={formatMessage({ id: 'dataSync.table.ok' })}
+                    cancelText={formatMessage({ id: 'dataSync.table.cancel' })}
+                >
+                    <a>{formatMessage({ id: 'dataSync.table.delete' })}</a>
+                </Popconfirm>
+            ),
         },
     ];
 

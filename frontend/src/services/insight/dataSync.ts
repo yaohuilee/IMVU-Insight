@@ -88,6 +88,24 @@ export async function listDataSyncRecords(
   );
 }
 
+/** Delete a DataSyncRecord by ID Delete a DataSyncRecord by its ID and return deletion result.
+
+Returns HTTP 200 with `{ "deleted": true }` on success, or
+HTTP 404 when the record does not exist. DELETE /data-sync/object */
+export async function deleteDataSyncRecord(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: INSIGHT_API.deleteDataSyncRecordParams,
+  options?: { [key: string]: any },
+) {
+  return request<any>(`/insight/api/data-sync/object`, {
+    method: 'DELETE',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** Import product data file Upload a product file and create a data sync record. POST /data-sync/product/import */
 export async function importProductFile(
   body: INSIGHT_API.BodyImportProductFile,

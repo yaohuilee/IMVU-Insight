@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional
-from datetime import date
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +13,7 @@ class DeveloperService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def create(self, *, developer_user_id: int, first_seen_at: date, last_seen_at: date) -> Developer:
+    async def create(self, *, developer_user_id: int, first_seen_at: datetime, last_seen_at: datetime) -> Developer:
         obj = Developer(
             developer_user_id=developer_user_id,
             first_seen_at=first_seen_at,
@@ -34,7 +34,7 @@ class DeveloperService:
         await self.session.commit()
         return True
 
-    async def update_last_seen(self, developer_user_id: int, last_seen_at: date) -> Optional[Developer]:
+    async def update_last_seen(self, developer_user_id: int, last_seen_at: datetime) -> Optional[Developer]:
         stmt = select(Developer).where(Developer.developer_user_id == developer_user_id)
         res = await self.session.execute(stmt)
         obj = res.scalar_one_or_none()

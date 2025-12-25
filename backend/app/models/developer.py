@@ -13,8 +13,8 @@ class Developer(Base):
     developer_user_id = Column(BigInteger, primary_key=True)
 
     # First and last snapshot dates seen in raw_product_list
-    first_seen_at = Column(Date, nullable=False)
-    last_seen_at = Column(Date, nullable=False)
+    first_seen_at = Column(DateTime, nullable=False)
+    last_seen_at = Column(DateTime, nullable=False)
 
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
 

@@ -153,6 +153,10 @@ async def import_product_file(
 
     record, content = await _handle_upload(session, file, DataType.PRODUCT)
 
+    # Extract record fields to avoid lazy loading issues after session commits
+    record_id = record.id
+    record_filename = record.filename
+
     # parse XML and insert raw product rows; return number of imported rows
     imported_count: int | None = None
     try:
@@ -184,15 +188,15 @@ async def import_product_file(
         svc2 = DataSyncService(session)
         snapshot = getattr(record, "uploaded_at", None)
         snapshot_date = snapshot.date() if snapshot is not None else date.today()
-        imported_count = await svc2.add_raw_product_list(sync_record_id=int(record.id), snapshot_date=snapshot_date, records=entries)
+        imported_count = await svc2.add_raw_product_list(sync_record_id=record_id, snapshot_date=snapshot_date, records=entries)
     except ET.ParseError as exc:
-        logger.exception("Failed to parse product XML for DataSyncRecord id=%s: %s", getattr(record, "id", None), exc)
+        logger.exception("Failed to parse product XML for DataSyncRecord id=%s: %s", record_id, exc)
         imported_count = 0
     except Exception as exc:  # pragma: no cover - unexpected errors
-        logger.exception("Unexpected error while importing product XML for DataSyncRecord id=%s", getattr(record, "id", None))
+        logger.exception("Unexpected error while importing product XML for DataSyncRecord id=%s", record_id)
         imported_count = 0
 
-    return DataSyncCreateResponse(id=int(record.id), filename=record.filename, imported_count=imported_count)
+    return DataSyncCreateResponse(id=record_id, filename=record_filename, imported_count=imported_count)
 
 
 @router.post(
@@ -208,6 +212,10 @@ async def import_income_file(
     """Upload an income file and create a data sync record."""
 
     record, content = await _handle_upload(session, file, DataType.INCOME)
+
+    # Extract record fields to avoid lazy loading issues after session commits
+    record_id = record.id
+    record_filename = record.filename
 
     # parse XML and insert raw income rows; return number of imported rows
     imported_count: int | None = None
@@ -247,15 +255,15 @@ async def import_income_file(
         svc2 = DataSyncService(session)
         snapshot = getattr(record, "uploaded_at", None)
         snapshot_date = snapshot.date() if snapshot is not None else date.today()
-        imported_count = await svc2.add_raw_income_log(sync_record_id=int(record.id), snapshot_date=snapshot_date, records=entries)
+        imported_count = await svc2.add_raw_income_log(sync_record_id=record_id, snapshot_date=snapshot_date, records=entries)
     except ET.ParseError as exc:
-        logger.exception("Failed to parse income XML for DataSyncRecord id=%s: %s", getattr(record, "id", None), exc)
+        logger.exception("Failed to parse income XML for DataSyncRecord id=%s: %s", record_id, exc)
         imported_count = 0
     except Exception as exc:  # pragma: no cover - unexpected errors
-        logger.exception("Unexpected error while importing income XML for DataSyncRecord id=%s", getattr(record, "id", None))
+        logger.exception("Unexpected error while importing income XML for DataSyncRecord id=%s", record_id)
         imported_count = 0
 
-    return DataSyncCreateResponse(id=int(record.id), filename=record.filename, imported_count=imported_count)
+    return DataSyncCreateResponse(id=record_id, filename=record_filename, imported_count=imported_count)
 
 
 @router.get(

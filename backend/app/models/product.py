@@ -20,10 +20,15 @@ class Product(Base):
 
     visible = Column(Boolean, nullable=False)
 
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+    )
     updated_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+    first_sold_at = Column(DateTime, nullable=True)
+    last_sold_at = Column(DateTime, nullable=True)

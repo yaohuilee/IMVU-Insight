@@ -12,6 +12,7 @@ from app.core.db import check_db_connection, get_db_session
 from app.routes.data_sync import router as data_sync_router
 from app.routes.product import router as product_router
 from app.routes.imvu_user import router as imvu_user_router
+from app.routes.income_transaction import router as income_transaction_router
 
 
 settings = get_settings()
@@ -70,3 +71,4 @@ app.include_router(router)
 app.include_router(data_sync_router)
 app.include_router(product_router)
 app.include_router(imvu_user_router)
+app.include_router(income_transaction_router)

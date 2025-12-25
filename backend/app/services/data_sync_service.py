@@ -5,14 +5,17 @@ from typing import Optional, Sequence, Tuple, List
 from datetime import date
 
 from sqlalchemy import select, func, delete
+from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.data_sync import DataSyncRecord, DataType
 from app.models.raw_product_list import RawProductList
 from app.models.raw_income_log import RawIncomeLog
+from app.models.income_transaction import IncomeTransaction
 from app.services.data_sync_developer_service import DataSyncDeveloperService
 from app.services.data_sync_imvu_user_service import DataSyncImvuUserService
 from app.services.data_sync_product_service import DataSyncProductService
+from app.services.data_sync_income_service import DataSyncIncomeService
 
 
 class DataSyncService:
@@ -21,6 +24,8 @@ class DataSyncService:
         self.developer_service = DataSyncDeveloperService(session)
         self.imvu_user_service = DataSyncImvuUserService(session)
         self.product_service = DataSyncProductService(session)
+        self.income_service = DataSyncIncomeService(session)
+        
 
     async def get_by_hash(self, hash_value: str) -> Optional[DataSyncRecord]:
         stmt = select(DataSyncRecord).where(DataSyncRecord.hash == hash_value).order_by(DataSyncRecord.uploaded_at.desc())
@@ -205,7 +210,10 @@ class DataSyncService:
             # upsert products based on income records
             await self.product_service.ensure_products_from_income(product_ids=product_ids, records=records, snapshot_date=snapshot_date)
 
-            # Commit any created/updated developer/user/product rows
+            # create income_transaction rows from raw records via dedicated service
+            await self.income_service.create_transactions_from_records(records)
+
+            # Commit any created/updated developer/user/product rows and derived transactions
             await self.session.commit()
         except Exception:
             # best-effort: rollback and ignore so raw insertion remains successful

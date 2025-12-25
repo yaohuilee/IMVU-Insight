@@ -14,6 +14,7 @@ from .raw_income_log import RawIncomeLog  # noqa: F401
 from .developer import Developer  # noqa: F401
 from .imvu_user import ImvuUser  # noqa: F401
 from .product import Product  # noqa: F401
+from .income_transaction import IncomeTransaction  # noqa: F401
 
 __all__ = [
     "DataSyncRecord",
@@ -22,4 +23,5 @@ __all__ = [
     "Developer",
     "ImvuUser",
     "Product",
+    "IncomeTransaction",
 ]

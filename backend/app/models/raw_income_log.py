@@ -20,6 +20,8 @@ class RawIncomeLog(Base):
 
     id = Column(BigInteger, primary_key=True)
 
+    # XML parent: developer_id attribute on the root node
+    developer_id = Column(BigInteger, nullable=False, index=True)
     # file / snapshot
     sync_record_id = Column(Integer, ForeignKey("data_sync_records.id", ondelete="CASCADE"), nullable=False, index=True)
     snapshot_date = Column(Date, nullable=False, index=True)

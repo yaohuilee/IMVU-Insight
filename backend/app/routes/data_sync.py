@@ -157,9 +157,12 @@ async def import_product_file(
     imported_count: int | None = None
     try:
         root = ET.fromstring(content)
+        dev_raw = root.get("developer_id")
+        developer_id = int(dev_raw) if dev_raw else None
         entries = []
         for el in root.findall(".//product_list_entry"):
             entries.append({
+                "developer_id": developer_id,
                 "product_id": int(el.get("product_id")) if el.get("product_id") else None,
                 "product_name": el.get("product_name", ""),
                 "price": el.get("price", ""),
@@ -210,6 +213,8 @@ async def import_income_file(
     imported_count: int | None = None
     try:
         root = ET.fromstring(content)
+        dev_raw = root.get("developer_id")
+        developer_id = int(dev_raw) if dev_raw else None
         entries = []
         for el in root.findall(".//developer_income_entry"):
             # parse purchase_date into datetime; fallback to now if missing
@@ -220,6 +225,7 @@ async def import_income_file(
                 purchase_dt = datetime.utcnow()
 
             entries.append({
+                "developer_id": developer_id,
                 "sales_log_id": int(el.get("sales_log_id")) if el.get("sales_log_id") else None,
                 "buyer_id": int(el.get("buyer_id")) if el.get("buyer_id") else None,
                 "buyer_name": el.get("buyer_name", ""),

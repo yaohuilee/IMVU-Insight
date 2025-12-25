@@ -94,6 +94,7 @@ class DataSyncService:
             obj = RawProductList(
                 sync_record_id=sync_record_id,
                 snapshot_date=snapshot_date,
+                developer_id=r.get("developer_id"),
                 product_id=r.get("product_id"),
                 product_name=r.get("product_name", ""),
                 price=r.get("price", ""),
@@ -142,6 +143,7 @@ class DataSyncService:
             obj = RawIncomeLog(
                 sync_record_id=sync_record_id,
                 snapshot_date=snapshot_date,
+                developer_id=r.get("developer_id"),
                 sales_log_id=r.get("sales_log_id"),
                 buyer_id=r.get("buyer_id"),
                 buyer_name=r.get("buyer_name", ""),

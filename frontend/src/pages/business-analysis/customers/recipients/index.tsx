@@ -2,7 +2,7 @@ import React from 'react';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Link, useIntl } from '@umijs/max';
 import { Helmet } from 'react-helmet-async';
-import { listImvuUsers } from '@/services/insight/imvuUser';
+import { listRecipients } from '@/services/insight/recipient';
 import type { ProColumns } from '@ant-design/pro-components';
 
 const Recipients: React.FC = () => {
@@ -21,6 +21,29 @@ const Recipients: React.FC = () => {
 			title: formatMessage({ id: 'imvuGraph.users.columns.name' }),
 			dataIndex: 'name',
 			key: 'name',
+		},
+		{
+			title: formatMessage({ id: 'businessAnalysis.customers.recipients.columns.receiveCount', defaultMessage: 'Receive Count' }),
+			dataIndex: 'receive_count',
+			key: 'receive_count',
+			width: 120,
+			align: 'right',
+		},
+		{
+			title: formatMessage({ id: 'businessAnalysis.customers.recipients.columns.totalCredits', defaultMessage: 'Total Credits' }),
+			dataIndex: 'total_credits',
+			key: 'total_credits',
+			width: 140,
+			align: 'right',
+			render: (val: any) => (val ? Number(val).toLocaleString() : val),
+		},
+		{
+			title: formatMessage({ id: 'businessAnalysis.customers.recipients.columns.totalPromoCredits', defaultMessage: 'Total Promo Credits' }),
+			dataIndex: 'total_promo_credits',
+			key: 'total_promo_credits',
+			width: 160,
+			align: 'right',
+			render: (val: any) => (val ? Number(val).toLocaleString() : val),
 		},
 		{
 			title: formatMessage({ id: 'imvuGraph.users.columns.firstSeen' }),
@@ -64,7 +87,7 @@ const Recipients: React.FC = () => {
 					request={async (params = {}) => {
 						const { current, pageSize, ...rest } = params as any;
 						try {
-							const res = await listImvuUsers({ page: current || 1, page_size: pageSize || 10, ...rest });
+							const res = await listRecipients({ page: current || 1, page_size: pageSize || 10, ...rest });
 							const anyRes = res as any;
 							const data = anyRes.items || anyRes.data || [];
 							const total = anyRes.total ?? anyRes.count ?? 0;

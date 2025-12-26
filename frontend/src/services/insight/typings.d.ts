@@ -53,6 +53,25 @@ declare namespace INSIGHT_API {
     file: string;
   };
 
+  type BuyerSummary = {
+    /** Id */
+    id: number;
+    /** Name */
+    name?: string | null;
+    /** Buy Count */
+    buy_count: number;
+    /** Total Spent */
+    total_spent: string;
+    /** Total Credits */
+    total_credits: string;
+    /** Total Promo Credits */
+    total_promo_credits: string;
+    /** First Seen */
+    first_seen: string;
+    /** Last Seen */
+    last_seen: string;
+  };
+
   type DataSyncCreateResponse = {
     /** Id */
     id: number;
@@ -146,6 +165,11 @@ declare namespace INSIGHT_API {
     created_at: string;
   };
 
+  type listBuyersParams = {
+    page?: number;
+    page_size?: number;
+  };
+
   type listDataSyncRecordsParams = {
     /** Page number */
     page?: number;
@@ -168,6 +192,22 @@ declare namespace INSIGHT_API {
   type listProductsParams = {
     page?: number;
     page_size?: number;
+  };
+
+  type listRecipientsParams = {
+    page?: number;
+    page_size?: number;
+  };
+
+  type PaginatedBuyerResponse = {
+    /** Total */
+    total: number;
+    /** Page */
+    page: number;
+    /** Page Size */
+    page_size: number;
+    /** Items */
+    items: BuyerSummary[];
   };
 
   type PaginatedImvuUserResponse = {
@@ -201,6 +241,36 @@ declare namespace INSIGHT_API {
     page_size: number;
     /** Items */
     items: app_routes_product_ProductSummary[];
+  };
+
+  type PaginatedRecipientResponse = {
+    /** Total */
+    total: number;
+    /** Page */
+    page: number;
+    /** Page Size */
+    page_size: number;
+    /** Items */
+    items: RecipientSummary[];
+  };
+
+  type RecipientSummary = {
+    /** Id */
+    id: number;
+    /** Name */
+    name?: string | null;
+    /** Receive Count */
+    receive_count: number;
+    /** Total Received */
+    total_received: string;
+    /** Total Credits */
+    total_credits: string;
+    /** Total Promo Credits */
+    total_promo_credits: string;
+    /** First Seen */
+    first_seen: string;
+    /** Last Seen */
+    last_seen: string;
   };
 
   type ValidationError = {

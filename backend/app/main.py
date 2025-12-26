@@ -13,6 +13,8 @@ from app.routes.data_sync import router as data_sync_router
 from app.routes.product import router as product_router
 from app.routes.imvu_user import router as imvu_user_router
 from app.routes.income_transaction import router as income_transaction_router
+from app.routes.buyer import router as buyer_router
+from app.routes.recipient import router as recipient_router
 
 
 settings = get_settings()
@@ -72,3 +74,5 @@ app.include_router(data_sync_router)
 app.include_router(product_router)
 app.include_router(imvu_user_router)
 app.include_router(income_transaction_router)
+app.include_router(buyer_router)
+app.include_router(recipient_router)

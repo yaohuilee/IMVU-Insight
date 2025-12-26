@@ -56,7 +56,7 @@ const Users: React.FC = () => {
                 <title>{title}</title>
             </Helmet>
             <PageContainer title={formatMessage({ id: 'imvuGraph.users.pageTitle' })}>
-                <ProTable<INSIGHT_API.ImvuUserSummary>
+                <ProTable<INSIGHT_API.app_routes_imvuUser_ImvuUserSummary>
                     columns={columns}
                     rowKey="id"
                     search={false}

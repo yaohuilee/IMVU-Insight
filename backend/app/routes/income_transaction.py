@@ -9,19 +9,11 @@ from sqlalchemy import select
 
 from app.core.db import get_db_session
 from app.services.income_transaction_service import IncomeTransactionService
-from app.services.product_service import ProductService
-from app.services.imvu_user_service import ImvuUserService
-from app.models import Product, ImvuUser
-from app.routes.imvu_user import ImvuUserSummary
+from app.routes.imvu_user import ImvuUserSummary, PaginationParams
 from app.routes.product import ProductSummary
 
 
 router = APIRouter(prefix="/income_transaction", tags=["IncomeTransaction"])
-
-
-class PaginationParams(BaseModel):
-    page: int = Field(1, ge=1, description="Page number (1-based)")
-    page_size: int = Field(50, ge=1, le=500, description="Items per page")
 
 
 class IncomeTransactionItem(BaseModel):
@@ -59,21 +51,21 @@ class PaginatedIncomeTransactionResponse(BaseModel):
     items: list[IncomeTransactionItem]
 
 
-@router.get(
+@router.post(
     "/list",
     operation_id="listIncomeTransactions",
     summary="List IncomeTransaction objects (paginated)",
     response_model=PaginatedIncomeTransactionResponse,
 )
 async def list_income_transactions(
-    params: PaginationParams = Depends(),
+    params: PaginationParams,
     session: AsyncSession = Depends(get_db_session),
 ):
     svc = IncomeTransactionService(session)
-    prod_svc = ProductService(session)
-    user_svc = ImvuUserService(session)
 
-    rows, total = await svc.list_paginated_with_relations(page=params.page, per_page=params.page_size)
+    rows, total = await svc.list_paginated_with_relations(
+        page=params.page, per_page=params.page_size, orders=params.orders
+    )
 
     result_items: list[IncomeTransactionItem] = []
     for t, prod, buyer, recipient in rows:
@@ -88,8 +80,14 @@ async def list_income_transactions(
             else None
         )
 
-        buyer_summary = ImvuUserSummary(id=buyer.user_id, name=buyer.user_name) if buyer is not None else None
-        recipient_summary = ImvuUserSummary(id=recipient.user_id, name=recipient.user_name) if recipient is not None else None
+        buyer_summary = (
+            ImvuUserSummary(id=buyer.user_id, name=buyer.user_name) if buyer is not None else None
+        )
+        recipient_summary = (
+            ImvuUserSummary(id=recipient.user_id, name=recipient.user_name)
+            if recipient is not None
+            else None
+        )
 
         result_items.append(
             IncomeTransactionItem(
@@ -113,4 +111,6 @@ async def list_income_transactions(
             )
         )
 
-    return PaginatedIncomeTransactionResponse(total=total, page=params.page, page_size=params.page_size, items=result_items)
+    return PaginatedIncomeTransactionResponse(
+        total=total, page=params.page, page_size=params.page_size, items=result_items
+    )

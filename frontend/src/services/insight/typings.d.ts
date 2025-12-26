@@ -146,11 +146,6 @@ declare namespace INSIGHT_API {
     type?: DataType | null;
   };
 
-  type listIncomeTransactionsParams = {
-    page?: number;
-    page_size?: number;
-  };
-
   type listProductsParams = {
     page?: number;
     page_size?: number;

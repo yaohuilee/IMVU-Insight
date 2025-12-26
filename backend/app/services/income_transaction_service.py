@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple
 from decimal import Decimal
 from datetime import datetime
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, asc, desc
 from sqlalchemy.orm import aliased
 
 from app.models import Product, ImvuUser
@@ -114,7 +114,9 @@ class IncomeTransactionService:
         total = int(cnt_res.scalar_one())
         return items, total
 
-    async def list_paginated_with_relations(self, page: int = 1, per_page: int = 50) -> Tuple[List[tuple], int]:
+    async def list_paginated_with_relations(
+        self, page: int = 1, per_page: int = 50, orders: Optional[list] = None
+    ) -> Tuple[List[tuple], int]:
         """Return list of tuples (IncomeTransaction, Product|None, buyer ImvuUser|None, recipient ImvuUser|None) and total count.
 
         This performs a single SQL query with LEFT OUTER JOINs to fetch related product and user rows.
@@ -131,10 +133,47 @@ class IncomeTransactionService:
             .join(Product, IncomeTransaction.product_id == Product.product_id, isouter=True)
             .join(Buyer, IncomeTransaction.buyer_user_id == Buyer.user_id, isouter=True)
             .join(Recipient, IncomeTransaction.recipient_user_id == Recipient.user_id, isouter=True)
-            .order_by(IncomeTransaction.transaction_id)
-            .offset(offset)
-            .limit(per_page)
         )
+
+        # build ordering from `orders` similar to ImvuUserService
+        order_cols = []
+        if orders:
+            special_map = {
+
+            }
+
+            for o in orders:
+                if hasattr(o, "property"):
+                    prop = getattr(o, "property")
+                    direction = (getattr(o, "direction", None) or "ASC").upper()
+                else:
+                    prop = o.get("property")
+                    direction = (o.get("direction") or "ASC").upper()
+
+                if not prop:
+                    continue
+
+                mapped = special_map.get(prop)
+                col = None
+                if mapped:
+                    col = getattr(IncomeTransaction, mapped, None)
+                else:
+                    col = getattr(IncomeTransaction, prop, None)
+                    if col is None:
+                        snake = "".join([
+                            "_" + c.lower() if c.isupper() else c for c in prop
+                        ]).lstrip("_")
+                        col = getattr(IncomeTransaction, snake, None)
+
+                if col is not None:
+                    order_cols.append(asc(col) if direction == "ASC" else desc(col))
+
+        if order_cols:
+            stmt = stmt.order_by(*order_cols)
+        else:
+            stmt = stmt.order_by(IncomeTransaction.transaction_id)
+
+        stmt = stmt.offset(offset).limit(per_page)
 
         res = await self.session.execute(stmt)
         rows = res.all()

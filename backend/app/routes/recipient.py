@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import List
 from datetime import datetime
 
+from app.routes.imvu_user import OrderItem
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +19,7 @@ router = APIRouter(prefix="/recipient", tags=["Recipient"])
 class PaginationParams(BaseModel):
     page: int = Field(1, ge=1, description="Page number (1-based)")
     page_size: int = Field(50, ge=1, le=200, description="Items per page")
+    orders: list[OrderItem] = []
 
 
 class RecipientSummary(BaseModel):

@@ -3,6 +3,7 @@ import { message } from 'antd';
 import { Link, useIntl } from '@umijs/max';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
+import type { SortOrder } from 'antd/es/table/interface';
 import { listIncomeTransactions } from '@/services/insight/incomeTransaction';
 
 const CreditTab: React.FC = () => {
@@ -15,6 +16,7 @@ const CreditTab: React.FC = () => {
             dataIndex: 'transaction_id',
             key: 'transaction_id',
             width: 100,
+            sorter: true,
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.transaction_time', defaultMessage: 'Time' }),
@@ -22,6 +24,7 @@ const CreditTab: React.FC = () => {
             key: 'transaction_time',
             valueType: 'dateTime',
             width: 160,
+            sorter: true,
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.product', defaultMessage: 'Product' }),
@@ -71,6 +74,7 @@ const CreditTab: React.FC = () => {
                     key: 'paid_credits',
                     width: 100,
                     align: 'right',
+                    sorter: true,
                 },
                 {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.paid.promoCredits', defaultMessage: 'Promo Credits' }),
@@ -78,6 +82,7 @@ const CreditTab: React.FC = () => {
                     key: 'paid_promo_credits',
                     width: 130,
                     align: 'right',
+                    sorter: true,
                 },
                 {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.paid.totalCredits', defaultMessage: 'Total Credits' }),
@@ -85,6 +90,7 @@ const CreditTab: React.FC = () => {
                     key: 'paid_total_credits',
                     width: 120,
                     align: 'right',
+                    sorter: true,
                 },
             ],
         },
@@ -97,6 +103,7 @@ const CreditTab: React.FC = () => {
                     key: 'income_credits',
                     width: 100,
                     align: 'right',
+                    sorter: true,
                 },
                 {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.income.promoCredits', defaultMessage: 'Promo Credits' }),
@@ -104,6 +111,7 @@ const CreditTab: React.FC = () => {
                     key: 'income_promo_credits',
                     width: 130,
                     align: 'right',
+                    sorter: true,
                 },
                 {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.income.totalCredits', defaultMessage: 'Total Credits' }),
@@ -111,6 +119,7 @@ const CreditTab: React.FC = () => {
                     key: 'income_total_credits',
                     width: 120,
                     align: 'right',
+                    sorter: true,
                 },
             ],
         }
@@ -126,12 +135,25 @@ const CreditTab: React.FC = () => {
                 showSizeChanger: true,
             }}
             search={false}
-            request={async (params: any) => {
-                const p = params.current || 1;
-                const ps = params.pageSize || 50;
+            request={async (params: any = {}, sort: Record<string, SortOrder | null> = {}) => {
+                const { current, pageSize, ...rest } = params as any;
+                const p = current || 1;
+                const ps = pageSize || 50;
+                const order: INSIGHT_API.OrderItem[] = Object.keys(sort).length
+                    ? Object.entries(sort).map(([property, direction]) => ({
+                          property,
+                          direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
+                      }))
+                    : [];
                 try {
+                    const body: INSIGHT_API.PaginationParams = {
+                        page: p,
+                        page_size: ps,
+                        orders: order,
+                        ...rest,
+                    } as unknown as INSIGHT_API.PaginationParams;
                     // @ts-ignore
-                    const resp: any = await listIncomeTransactions({ page: p, page_size: ps });
+                    const resp: any = await listIncomeTransactions(body);
                     const items = resp?.items || resp?.data || resp?.results || [];
                     const total = resp?.total ?? (Array.isArray(items) ? items.length : 0);
                     return {

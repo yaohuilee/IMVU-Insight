@@ -6,12 +6,16 @@ import { request } from '@umijs/max';
 export async function listRecipients(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: INSIGHT_API.listRecipientsParams,
+  body: INSIGHT_API.OrderItem[],
   options?: { [key: string]: any },
 ) {
   return request<INSIGHT_API.PaginatedRecipientResponse>(
     `/insight/api/recipient/list`,
     {
       method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       params: {
         // page has a default value: 1
         page: '1',
@@ -19,6 +23,7 @@ export async function listRecipients(
         page_size: '50',
         ...params,
       },
+      data: body,
       ...(options || {}),
     },
   );

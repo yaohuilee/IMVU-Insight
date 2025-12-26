@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
+from app.routes.imvu_user import OrderItem
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +18,7 @@ router = APIRouter(prefix="/product", tags=["Product"])
 class PaginationParams(BaseModel):
     page: int = Field(1, ge=1, description="Page number (1-based)")
     page_size: int = Field(20, ge=1, le=200, description="Items per page")
+    orders: list[OrderItem] = []
 
 
 class ProductSummary(BaseModel):

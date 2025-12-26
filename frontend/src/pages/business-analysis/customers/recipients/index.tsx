@@ -79,7 +79,7 @@ const Recipients: React.FC = () => {
 				<title>{title}</title>
 			</Helmet>
 			<PageContainer title={formatMessage({ id: 'businessAnalysis.customers.recipients.pageTitle' })}>
-				<ProTable<INSIGHT_API.ImvuUserSummary>
+				<ProTable<INSIGHT_API.RecipientSummary>
 					columns={columns}
 					rowKey="id"
 					search={false}

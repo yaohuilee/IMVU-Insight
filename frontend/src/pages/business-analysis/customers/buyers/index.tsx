@@ -79,7 +79,7 @@ const Buyers: React.FC = () => {
 				<title>{title}</title>
 			</Helmet>
 			<PageContainer title={formatMessage({ id: 'businessAnalysis.customers.buyers.pageTitle' })}>
-				<ProTable<INSIGHT_API.ImvuUserSummary>
+				<ProTable<INSIGHT_API.BuyerSummary>
 					columns={columns}
 					rowKey="id"
 					search={false}

@@ -12,6 +12,8 @@ from app.services.income_transaction_service import IncomeTransactionService
 from app.services.product_service import ProductService
 from app.services.imvu_user_service import ImvuUserService
 from app.models import Product, ImvuUser
+from app.routes.imvu_user import ImvuUserSummary
+from app.routes.product import ProductSummary
 
 
 router = APIRouter(prefix="/income_transaction", tags=["IncomeTransaction"])
@@ -20,18 +22,6 @@ router = APIRouter(prefix="/income_transaction", tags=["IncomeTransaction"])
 class PaginationParams(BaseModel):
     page: int = Field(1, ge=1, description="Page number (1-based)")
     page_size: int = Field(50, ge=1, le=500, description="Items per page")
-
-
-class ProductSummary(BaseModel):
-    product_id: int
-    product_name: str
-    visible: bool
-    price: float
-
-
-class ImvuUserSummary(BaseModel):
-    id: int
-    name: str | None = None
 
 
 class IncomeTransactionItem(BaseModel):

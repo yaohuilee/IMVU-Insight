@@ -67,7 +67,7 @@ const Products: React.FC = () => {
 				<title>{title}</title>
 			</Helmet>
 			<PageContainer title={formatMessage({ id: 'businessAnalysis.products.pageTitle' })}>
-				<ProTable<INSIGHT_API.app_routes_product_ProductSummary>
+				<ProTable<INSIGHT_API.ProductSummary>
 					columns={columns}
 					rowKey="product_id"
 					request={async (params = { current: 1, pageSize: 10 }) => {

@@ -28,8 +28,8 @@ class PaginationParams(BaseModel):
 class ImvuUserSummary(BaseModel):
     id: int
     name: str | None = None
-    first_seen: datetime
-    last_seen: datetime
+    first_seen: Optional[datetime] = None
+    last_seen: Optional[datetime] = None
 
 
 class PaginatedImvuUserResponse(BaseModel):

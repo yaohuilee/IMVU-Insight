@@ -1,48 +1,4 @@
 declare namespace INSIGHT_API {
-  type app_routes_imvuUser_ImvuUserSummary = {
-    /** Id */
-    id: number;
-    /** Name */
-    name?: string | null;
-    /** First Seen */
-    first_seen: string;
-    /** Last Seen */
-    last_seen: string;
-  };
-
-  type app_routes_incomeTransaction_ImvuUserSummary = {
-    /** Id */
-    id: number;
-    /** Name */
-    name?: string | null;
-  };
-
-  type app_routes_incomeTransaction_ProductSummary = {
-    /** Product Id */
-    product_id: number;
-    /** Product Name */
-    product_name: string;
-    /** Visible */
-    visible: boolean;
-    /** Price */
-    price: number;
-  };
-
-  type app_routes_product_ProductSummary = {
-    /** Product Id */
-    product_id: number;
-    /** Product Name */
-    product_name: string;
-    /** Visible */
-    visible: boolean;
-    /** Price */
-    price: string;
-    /** First Sold At */
-    first_sold_at?: string | null;
-    /** Last Sold At */
-    last_sold_at?: string | null;
-  };
-
   type BodyImportIncomeFile = {
     /** File */
     file: string;
@@ -131,6 +87,17 @@ declare namespace INSIGHT_API {
     detail?: ValidationError[];
   };
 
+  type ImvuUserSummary = {
+    /** Id */
+    id: number;
+    /** Name */
+    name?: string | null;
+    /** First Seen */
+    first_seen?: string | null;
+    /** Last Seen */
+    last_seen?: string | null;
+  };
+
   type IncomeTransactionItem = {
     /** Transaction Id */
     transaction_id: number;
@@ -138,15 +105,15 @@ declare namespace INSIGHT_API {
     transaction_time: string;
     /** Product Id */
     product_id: number;
-    product?: app_routes_incomeTransaction_ProductSummary | null;
+    product?: ProductSummary | null;
     /** Developer User Id */
     developer_user_id: number;
     /** Buyer User Id */
     buyer_user_id: number;
-    buyer_user?: app_routes_incomeTransaction_ImvuUserSummary | null;
+    buyer_user?: ImvuUserSummary | null;
     /** Recipient User Id */
     recipient_user_id: number;
-    recipient_user?: app_routes_incomeTransaction_ImvuUserSummary | null;
+    recipient_user?: ImvuUserSummary | null;
     /** Reseller User Id */
     reseller_user_id?: number | null;
     /** Paid Credits */
@@ -220,7 +187,7 @@ declare namespace INSIGHT_API {
     /** Page Size */
     page_size: number;
     /** Items */
-    items: app_routes_imvuUser_ImvuUserSummary[];
+    items: ImvuUserSummary[];
   };
 
   type PaginatedIncomeTransactionResponse = {
@@ -242,7 +209,7 @@ declare namespace INSIGHT_API {
     /** Page Size */
     page_size: number;
     /** Items */
-    items: app_routes_product_ProductSummary[];
+    items: ProductSummary[];
   };
 
   type PaginatedRecipientResponse = {
@@ -263,6 +230,21 @@ declare namespace INSIGHT_API {
     page_size?: number;
     /** Orders */
     orders?: OrderItem[];
+  };
+
+  type ProductSummary = {
+    /** Product Id */
+    product_id: number;
+    /** Product Name */
+    product_name: string;
+    /** Visible */
+    visible: boolean;
+    /** Price */
+    price: string;
+    /** First Sold At */
+    first_sold_at?: string | null;
+    /** Last Sold At */
+    last_sold_at?: string | null;
   };
 
   type RecipientSummary = {

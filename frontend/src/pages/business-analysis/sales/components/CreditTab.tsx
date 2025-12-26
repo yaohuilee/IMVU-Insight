@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { message } from 'antd';
 import { Link, useIntl } from '@umijs/max';
 import { ProTable } from '@ant-design/pro-components';
-import type { ProColumns } from '@ant-design/pro-components';
+import type { ProColumns, ActionType } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
 import { listIncomeTransactions } from '@/services/insight/incomeTransaction';
 
 const CreditTab: React.FC = () => {
 
     const { formatMessage } = useIntl();
+    const actionRef = useRef<ActionType>();
 
     const columns: ProColumns<INSIGHT_API.IncomeTransactionItem>[] = [
         {
@@ -28,11 +29,11 @@ const CreditTab: React.FC = () => {
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.product', defaultMessage: 'Product' }),
-            dataIndex: ['product', 'product_name'],
-            key: 'product_name',
+            dataIndex: 'product_id',
+            sorter: true,
             render: (_: any, record: any) => {
-                const name = record?.product?.product_name ?? record?.product_id;
-                const id = record?.product?.product_id ?? record?.product_id;
+                const name = record?.product?.name ?? record?.product_id;
+                const id = record?.product?.id ?? record?.product_id;
                 return (
                     <Link to={`/business-analysis/products/${id}`}>{name}</Link>
                 );
@@ -41,8 +42,8 @@ const CreditTab: React.FC = () => {
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.buyer', defaultMessage: 'Buyer' }),
-            dataIndex: ['buyer_user', 'name'],
-            key: 'buyer_name',
+            dataIndex: 'buyer_user_id',
+            sorter: true,
             render: (_: any, record: any) => {
                 const name = record?.buyer_user?.name ?? record?.buyer_user_id;
                 const id = record?.buyer_user?.id ?? record?.buyer_user_id;
@@ -54,8 +55,8 @@ const CreditTab: React.FC = () => {
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.recipient', defaultMessage: 'Recipient' }),
-            dataIndex: ['recipient_user', 'name'],
-            key: 'recipient_name',
+            dataIndex: 'recipient_user_id',
+            sorter: true,
             render: (_: any, record: any) => {
                 const name = record?.recipient_user?.name ?? record?.recipient_user_id;
                 const id = record?.recipient_user?.id ?? record?.recipient_user_id;
@@ -130,25 +131,22 @@ const CreditTab: React.FC = () => {
             headerTitle={formatMessage({ id: 'businessAnalysis.sales.creditTab.headerTitle', defaultMessage: 'Credit Transactions' })}
             columns={columns}
             rowKey="transaction_id"
-            pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-            }}
+            actionRef={actionRef}
+            pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
             search={false}
             request={async (params: any = {}, sort: Record<string, SortOrder | null> = {}) => {
                 const { current, pageSize, ...rest } = params as any;
-                const p = current || 1;
-                const ps = pageSize || 50;
+
                 const order: INSIGHT_API.OrderItem[] = Object.keys(sort).length
                     ? Object.entries(sort).map(([property, direction]) => ({
-                          property,
-                          direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
-                      }))
+                        property,
+                        direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
+                    }))
                     : [];
                 try {
                     const body: INSIGHT_API.PaginationParams = {
-                        page: p,
-                        page_size: ps,
+                        page: current,
+                        page_size: pageSize,
                         orders: order,
                         ...rest,
                     } as unknown as INSIGHT_API.PaginationParams;

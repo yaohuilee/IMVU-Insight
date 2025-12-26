@@ -1,5 +1,6 @@
 import React from 'react';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
+import type { SortOrder } from 'antd/es/table/interface';
 import { Link, useIntl } from '@umijs/max';
 import { Helmet } from 'react-helmet-async';
 import { listBuyers } from '@/services/insight/buyer';
@@ -16,11 +17,13 @@ const Buyers: React.FC = () => {
 			dataIndex: 'id',
 			key: 'id',
 			width: 100,
+			sorter: true,
 		},
 		{
 			title: formatMessage({ id: 'imvuGraph.users.columns.name' }),
 			dataIndex: 'name',
 			key: 'name',
+			sorter: true,
 		},
 		{
 			title: formatMessage({ id: 'businessAnalysis.customers.buyers.columns.buyCount', defaultMessage: 'Buy Count' }),
@@ -28,6 +31,7 @@ const Buyers: React.FC = () => {
 			key: 'buy_count',
 			width: 120,
 			align: 'right',
+			sorter: true,
 		},
 		{
 			title: formatMessage({ id: 'businessAnalysis.customers.buyers.columns.totalCredits', defaultMessage: 'Total Credits' }),
@@ -36,6 +40,7 @@ const Buyers: React.FC = () => {
 			width: 140,
 			align: 'right',
 			render: (val: any) => (val ? Number(val).toLocaleString() : val),
+			sorter: true,
 		},
 		{
 			title: formatMessage({ id: 'businessAnalysis.customers.buyers.columns.totalPromoCredits', defaultMessage: 'Total Promo Credits' }),
@@ -44,6 +49,7 @@ const Buyers: React.FC = () => {
 			width: 160,
 			align: 'right',
 			render: (val: any) => (val ? Number(val).toLocaleString() : val),
+			sorter: true,
 		},
 		{
 			title: formatMessage({ id: 'imvuGraph.users.columns.firstSeen' }),
@@ -51,6 +57,7 @@ const Buyers: React.FC = () => {
 			key: 'first_seen',
 			valueType: 'dateTime',
 			width: 180,
+			sorter: true,
 		},
 		{
 			title: formatMessage({ id: 'imvuGraph.users.columns.lastSeen' }),
@@ -58,6 +65,7 @@ const Buyers: React.FC = () => {
 			key: 'last_seen',
 			valueType: 'dateTime',
 			width: 180,
+			sorter: true,
 		},
 		{
 			align: 'center',
@@ -84,10 +92,16 @@ const Buyers: React.FC = () => {
 					rowKey="id"
 					search={false}
 					pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-					request={async (params = {}) => {
+					request={async (params = {}, sort: Record<string, SortOrder | null> = {}) => {
 						const { current, pageSize, ...rest } = params as any;
+						const order: INSIGHT_API.OrderItem[] = Object.keys(sort).length
+							? Object.entries(sort).map(([property, direction]) => ({
+								  property,
+								  direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
+							  }))
+							: [];
 						try {
-							const res = await listBuyers({ page: current || 1, page_size: pageSize || 10, ...rest });
+							const res = await listBuyers({ page: current || 1, page_size: pageSize || 10, orders: order, ...rest });
 							const anyRes = res as any;
 							const data = anyRes.items || anyRes.data || [];
 							const total = anyRes.total ?? anyRes.count ?? 0;

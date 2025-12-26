@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple
 from decimal import Decimal
 from datetime import datetime
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, asc, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Product
@@ -70,12 +70,53 @@ class ProductService:
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
-    async def list_paginated(self, page: int = 1, per_page: int = 50) -> Tuple[List[Product], int]:
+    async def list_paginated(self, page: int = 1, per_page: int = 50, orders: Optional[list] = None) -> Tuple[List[Product], int]:
         """Return (items, total_count) for given `page` (1-based) and `per_page`."""
         if page < 1:
             page = 1
         offset = (page - 1) * per_page
-        stmt = select(Product).order_by(Product.product_id).offset(offset).limit(per_page)
+        stmt = select(Product)
+
+        order_cols = []
+        if orders:
+            special_map = {
+                "id": "product_id",
+                "product_id": "product_id",
+                "name": "product_name",
+                "product_name": "product_name",
+                "price": "price",
+            }
+
+            for o in orders:
+                if hasattr(o, "property"):
+                    prop = getattr(o, "property")
+                    direction = (getattr(o, "direction", None) or "ASC").upper()
+                else:
+                    prop = o.get("property")
+                    direction = (o.get("direction") or "ASC").upper()
+
+                if not prop:
+                    continue
+
+                mapped = special_map.get(prop)
+                col = None
+                if mapped:
+                    col = getattr(Product, mapped, None)
+                else:
+                    col = getattr(Product, prop, None)
+                    if col is None:
+                        snake = "".join(["_" + c.lower() if c.isupper() else c for c in prop]).lstrip("_")
+                        col = getattr(Product, snake, None)
+
+                if col is not None:
+                    order_cols.append(asc(col) if direction == "ASC" else desc(col))
+
+        if order_cols:
+            stmt = stmt.order_by(*order_cols)
+        else:
+            stmt = stmt.order_by(Product.product_id)
+
+        stmt = stmt.offset(offset).limit(per_page)
         res = await self.session.execute(stmt)
         items = res.scalars().all()
 

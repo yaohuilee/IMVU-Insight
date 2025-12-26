@@ -132,11 +132,6 @@ declare namespace INSIGHT_API {
     created_at: string;
   };
 
-  type listBuyersParams = {
-    page?: number;
-    page_size?: number;
-  };
-
   type listDataSyncRecordsParams = {
     /** Page number */
     page?: number;
@@ -144,16 +139,6 @@ declare namespace INSIGHT_API {
     page_size?: number;
     /** Filter by data type */
     type?: DataType | null;
-  };
-
-  type listProductsParams = {
-    page?: number;
-    page_size?: number;
-  };
-
-  type listRecipientsParams = {
-    page?: number;
-    page_size?: number;
   };
 
   type OrderItem = {
@@ -228,10 +213,10 @@ declare namespace INSIGHT_API {
   };
 
   type ProductSummary = {
-    /** Product Id */
-    product_id: number;
-    /** Product Name */
-    product_name: string;
+    /** Id */
+    id: number;
+    /** Name */
+    name: string;
     /** Visible */
     visible: boolean;
     /** Price */

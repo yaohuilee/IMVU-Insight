@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import List
 from datetime import datetime
 
-from app.routes.imvu_user import OrderItem
+from app.routes.imvu_user import OrderItem, PaginationParams
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,12 +14,6 @@ from app.services.recipient_service import RecipientService
 
 
 router = APIRouter(prefix="/recipient", tags=["Recipient"])
-
-
-class PaginationParams(BaseModel):
-    page: int = Field(1, ge=1, description="Page number (1-based)")
-    page_size: int = Field(50, ge=1, le=200, description="Items per page")
-    orders: list[OrderItem] = []
 
 
 class RecipientSummary(BaseModel):
@@ -40,20 +34,20 @@ class PaginatedRecipientResponse(BaseModel):
     items: List[RecipientSummary]
 
 
-@router.get(
+@router.post(
     "/list",
     operation_id="listRecipients",
     summary="List recipient aggregated stats (paginated)",
     response_model=PaginatedRecipientResponse,
 )
 async def list_recipients(
-    params: PaginationParams = Depends(),
+    params: PaginationParams,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return paginated recipient aggregated stats."""
 
     svc = RecipientService(session)
-    items, total = await svc.list_paginated(page=params.page, per_page=params.page_size)
+    items, total = await svc.list_paginated(page=params.page, per_page=params.page_size, orders=params.orders)
 
     result_items = [
         RecipientSummary(

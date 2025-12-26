@@ -71,8 +71,8 @@ async def list_income_transactions(
     for t, prod, buyer, recipient in rows:
         prod_summary = (
             ProductSummary(
-                product_id=prod.product_id,
-                product_name=prod.product_name,
+                id=prod.product_id,
+                name=prod.product_name,
                 visible=prod.visible,
                 price=float(prod.price),
             )

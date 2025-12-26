@@ -97,15 +97,26 @@ class IncomeTransactionService:
         return res.scalar_one_or_none() is not None
 
     async def get_by_id(self, transaction_id: int) -> Optional[IncomeTransaction]:
-        stmt = select(IncomeTransaction).where(IncomeTransaction.transaction_id == transaction_id).limit(1)
+        stmt = (
+            select(IncomeTransaction)
+            .where(IncomeTransaction.transaction_id == transaction_id)
+            .limit(1)
+        )
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
-    async def list_paginated(self, page: int = 1, per_page: int = 50) -> Tuple[List[IncomeTransaction], int]:
+    async def list_paginated(
+        self, page: int = 1, per_page: int = 50
+    ) -> Tuple[List[IncomeTransaction], int]:
         if page < 1:
             page = 1
         offset = (page - 1) * per_page
-        stmt = select(IncomeTransaction).order_by(IncomeTransaction.transaction_id).offset(offset).limit(per_page)
+        stmt = (
+            select(IncomeTransaction)
+            .order_by(IncomeTransaction.transaction_id)
+            .offset(offset)
+            .limit(per_page)
+        )
         res = await self.session.execute(stmt)
         items = res.scalars().all()
 
@@ -138,10 +149,6 @@ class IncomeTransactionService:
         # build ordering from `orders` similar to ImvuUserService
         order_cols = []
         if orders:
-            special_map = {
-
-            }
-
             for o in orders:
                 if hasattr(o, "property"):
                     prop = getattr(o, "property")
@@ -150,16 +157,30 @@ class IncomeTransactionService:
                     prop = o.get("property")
                     direction = (o.get("direction") or "ASC").upper()
 
+                # normalize comma-separated indices (e.g. 'buyer_user,name') to dot notation
+                if isinstance(prop, str):
+                    prop = prop.replace(",", ".").strip()
+
                 if not prop:
                     continue
 
-                mapped = special_map.get(prop)
                 col = None
-                if mapped:
-                    col = getattr(IncomeTransaction, mapped, None)
-                else:
+
+                # allow ordering by joined table columns using dot notation
+                # e.g., 'product.product_name', 'buyer.user_name', 'recipient.user_name'
+                if isinstance(prop, str) and "." in prop:
+                    left, right = prop.split(".", 1)
+                    if left == "product":
+                        col = getattr(Product, right, None)
+                    elif left == "buyer" or left == "buyer_user":
+                        col = getattr(Buyer, right, None)
+                    elif left == "recipient" or left == "recipient_user":
+                        col = getattr(Recipient, right, None)
+
+                # fallback: attribute on IncomeTransaction (supports product_id, buyer_user_id, ...)
+                if col is None:
                     col = getattr(IncomeTransaction, prop, None)
-                    if col is None:
+                    if col is None and isinstance(prop, str):
                         snake = "".join([
                             "_" + c.lower() if c.isupper() else c for c in prop
                         ]).lstrip("_")

@@ -56,9 +56,7 @@ class DataSyncProductService:
                     developer_user_id=r.get("developer_id") or 0,
                     product_name=name,
                     price=price_val,
-                    visible=visible_bool,
-                    first_sold_at=datetime.now(),
-                    last_sold_at=datetime.now(),
+                    visible=visible_bool
                 )
                 self.session.add(prod)
 

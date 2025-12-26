@@ -4,6 +4,7 @@ from typing import Sequence, Dict, Set
 from decimal import Decimal, InvalidOperation
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.models.income_transaction import IncomeTransaction
 
@@ -31,10 +32,24 @@ class DataSyncIncomeService:
                 except Exception:
                     return Decimal("0")
 
+        # collect sales_log_ids from incoming records and skip if none
+        sales_log_ids = [r.get("sales_log_id") for r in records if r.get("sales_log_id") is not None]
+        if not sales_log_ids:
+            return
+
+        # query existing transaction_ids in the DB to avoid duplicates
+        stmt = select(IncomeTransaction.transaction_id).where(IncomeTransaction.transaction_id.in_(sales_log_ids))
+        result = await self.session.execute(stmt)
+        existing_ids = set(result.scalars().all())
+
         objs = []
         for r in records:
             sales_log_id = r.get("sales_log_id")
             if sales_log_id is None:
+                continue
+
+            # skip records whose transaction_id already exists
+            if sales_log_id in existing_ids:
                 continue
 
             reseller_raw = r.get("reseller_id")

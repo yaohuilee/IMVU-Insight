@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -13,9 +14,15 @@ from app.services.imvu_user_service import ImvuUserService
 router = APIRouter(prefix="/imvu_user", tags=["IMVU User"])
 
 
+class OrderItem(BaseModel):
+    property: str
+    direction: Optional[str] = None  # "ASC" or "DESC"
+
+
 class PaginationParams(BaseModel):
     page: int = Field(1, ge=1, description="Page number (1-based)")
     page_size: int = Field(50, ge=1, le=200, description="Items per page")
+    orders: list[OrderItem] = []
 
 
 class ImvuUserSummary(BaseModel):
@@ -32,20 +39,22 @@ class PaginatedImvuUserResponse(BaseModel):
     items: list[ImvuUserSummary]
 
 
-@router.get(
+@router.post(
     "/list",
     operation_id="listImvuUsers",
     summary="List ImvuUser objects (paginated)",
     response_model=PaginatedImvuUserResponse,
 )
 async def list_imvu_users(
-    params: PaginationParams = Depends(),
+    params: PaginationParams,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return paginated imvu users (summary fields)."""
 
     svc = ImvuUserService(session)
-    items, total = await svc.list_paginated(page=params.page, per_page=params.page_size)
+    items, total = await svc.list_paginated(
+        page=params.page, per_page=params.page_size, orders=params.orders
+    )
 
     result_items = [
         ImvuUserSummary(
@@ -57,4 +66,6 @@ async def list_imvu_users(
         for u in items
     ]
 
-    return PaginatedImvuUserResponse(total=total, page=params.page, page_size=params.page_size, items=result_items)
+    return PaginatedImvuUserResponse(
+        total=total, page=params.page, page_size=params.page_size, items=result_items
+    )

@@ -1,4 +1,5 @@
 import { PageContainer, ProTable } from '@ant-design/pro-components';
+import type { SortOrder } from 'antd/es/table/interface';
 import { Link, useIntl } from '@umijs/max';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -16,11 +17,13 @@ const Users: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 100,
+            sorter: true,
         },
         {
             title: formatMessage({ id: 'imvuGraph.users.columns.name' }),
             dataIndex: 'name',
             key: 'name',
+            sorter: true,
         },
         {
             title: formatMessage({ id: 'imvuGraph.users.columns.firstSeen' }),
@@ -28,6 +31,7 @@ const Users: React.FC = () => {
             key: 'first_seen',
             valueType: 'dateTime',
             width: 180,
+            sorter: true,
         },
         {
             title: formatMessage({ id: 'imvuGraph.users.columns.lastSeen' }),
@@ -35,6 +39,7 @@ const Users: React.FC = () => {
             key: 'last_seen',
             valueType: 'dateTime',
             width: 180,
+            sorter: true,
         },
         {
             align: 'center',
@@ -61,10 +66,23 @@ const Users: React.FC = () => {
                     rowKey="id"
                     search={false}
                     pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-                    request={async (params = {}) => {
+                    request={async (params = {}, sort: Record<string, SortOrder | null> = {}) => {
                         const { current, pageSize, ...rest } = params as any;
+                        const order: INSIGHT_API.OrderItem[] = Object.keys(sort).length
+                            ? Object.entries(sort).map(([property, direction]) => ({
+                                  property,
+                                  direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
+                              }))
+                            : [];
                         try {
-                            const res = await listImvuUsers({ page: current || 1, page_size: pageSize || 10, ...rest });
+                            const body: INSIGHT_API.PaginationParams = {
+                                page: current || 1,
+                                page_size: pageSize || 10,
+                                orders: order,
+                                // include other params if needed
+                                ...rest,
+                            } as unknown as INSIGHT_API.PaginationParams;
+                            const res = await listImvuUsers(body);
                             const anyRes = res as any;
                             const data = anyRes.items || anyRes.data || [];
                             const total = anyRes.total ?? anyRes.count ?? 0;

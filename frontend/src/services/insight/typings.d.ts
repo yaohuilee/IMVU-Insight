@@ -179,11 +179,6 @@ declare namespace INSIGHT_API {
     type?: DataType | null;
   };
 
-  type listImvuUsersParams = {
-    page?: number;
-    page_size?: number;
-  };
-
   type listIncomeTransactionsParams = {
     page?: number;
     page_size?: number;
@@ -197,6 +192,13 @@ declare namespace INSIGHT_API {
   type listRecipientsParams = {
     page?: number;
     page_size?: number;
+  };
+
+  type OrderItem = {
+    /** Property */
+    property: string;
+    /** Direction */
+    direction?: string | null;
   };
 
   type PaginatedBuyerResponse = {
@@ -252,6 +254,15 @@ declare namespace INSIGHT_API {
     page_size: number;
     /** Items */
     items: RecipientSummary[];
+  };
+
+  type PaginationParams = {
+    /** Page Page number (1-based) */
+    page?: number;
+    /** Page Size Items per page */
+    page_size?: number;
+    /** Orders */
+    orders?: OrderItem[];
   };
 
   type RecipientSummary = {

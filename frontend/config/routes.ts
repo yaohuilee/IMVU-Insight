@@ -53,10 +53,24 @@ export default [
         component: './business-analysis/customers/buyers',
       },
       {
+        name: 'businessAnalysis.customers.buyers.detail',
+        locale: 'menu.businessAnalysis.customers.buyers.detail',
+        path: '/business-analysis/customers/buyers/:id',
+        component: './business-analysis/customers/buyers/detail',
+        hideInMenu: true,
+      },
+      {
         name: 'businessAnalysis.customers.recipients',
         locale: 'menu.businessAnalysis.customers.recipients',
         path: '/business-analysis/customers/recipients',
         component: './business-analysis/customers/recipients',
+      },
+      {
+        name: 'businessAnalysis.customers.recipients.detail',
+        locale: 'menu.businessAnalysis.customers.recipients.detail',
+        path: '/business-analysis/customers/recipients/:id',
+        component: './business-analysis/customers/recipients/detail',
+        hideInMenu: true,
       },
       {
         name: 'businessAnalysis.products',
@@ -64,6 +78,13 @@ export default [
         path: '/business-analysis/products',
         component: './business-analysis/products',
       },
+        {
+          name: 'businessAnalysis.products.detail',
+          locale: 'menu.businessAnalysis.products.detail',
+          path: '/business-analysis/products/:id',
+          component: './business-analysis/products/detail',
+          hideInMenu: true,
+        },
       {
         name: 'businessAnalysis.sales',
         locale: 'menu.businessAnalysis.sales',
@@ -85,6 +106,13 @@ export default [
         path: '/imvu-graph/users',
         component: './imvu-graph/users',
       },
+        {
+          name: 'imvuGraph.users.detail',
+          locale: 'menu.imvuGraph.users.detail',
+          path: '/imvu-graph/users/:id',
+          component: './imvu-graph/users/detail',
+          hideInMenu: true,
+        },
       {
         name: 'imvuGraph.relations',
         locale: 'menu.imvuGraph.relations',

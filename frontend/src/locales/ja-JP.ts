@@ -12,11 +12,15 @@ export default {
   'menu.dataSync': 'データ同期',
   'menu.businessAnalysis': 'ビジネス分析',
   'menu.businessAnalysis.customers.buyers': 'バイヤー',
+  'menu.businessAnalysis.customers.buyers.detail': '購入者詳細',
   'menu.businessAnalysis.customers.recipients': '受取人',
+  'menu.businessAnalysis.customers.recipients.detail': '受取人詳細',
   'menu.businessAnalysis.products': '製品',
+  'menu.businessAnalysis.products.detail': '製品詳細',
   'menu.businessAnalysis.sales': '売上',
   'menu.imvuGraph': 'IMVUグラフ',
   'menu.imvuGraph.users': 'IMVUユーザー',
+  'menu.imvuGraph.users.detail': 'ユーザー詳細',
   'menu.imvuGraph.relations': 'ユーザー関係',
   'menu.imvuGraph.entityExplorer': 'エンティティエクスプローラー',
   'menu.system': 'システム',
@@ -40,6 +44,20 @@ export default {
   'imvuGraph.users.columns.action.detail': '詳細',
   'businessAnalysis.customers.buyers.pageTitle': 'バイヤー',
   'businessAnalysis.customers.recipients.pageTitle': '受取人',
+  
+  // Menu / Breadcrumb labels for detail pages
+  'businessAnalysis.customers.buyers.detail': 'Buyer Detail',
+  'businessAnalysis.customers.recipients.detail': 'Recipient Detail',
+  
+  // Buyers Detail
+  'businessAnalysis.customers.buyers.detail.pageTitle': '購入者詳細',
+  'businessAnalysis.customers.buyers.detail.idLabel': '購入者ID: {id}',
+  'businessAnalysis.customers.buyers.detail.placeholder': 'これは購入者詳細のプレースホルダーです。',
+
+  // Recipients Detail
+  'businessAnalysis.customers.recipients.detail.pageTitle': '受取人詳細',
+  'businessAnalysis.customers.recipients.detail.idLabel': '受取人ID: {id}',
+  'businessAnalysis.customers.recipients.detail.placeholder': 'これは受取人詳細のプレースホルダーです。',
   'businessAnalysis.products.pageTitle': '製品',
 
   // Business Analysis - Products table
@@ -52,6 +70,16 @@ export default {
   'businessAnalysis.products.columns.action': '操作',
   'businessAnalysis.products.action.detail': '詳細',
   'businessAnalysis.sales.pageTitle': '売上',
+
+  // Product Detail
+  'businessAnalysis.products.detail.pageTitle': 'Product Detail',
+  'businessAnalysis.products.detail.idLabel': 'Product ID: {id}',
+  'businessAnalysis.products.detail.placeholder': 'This is a placeholder for product detail content.',
+
+  // IMVU User Detail
+  'imvuGraph.users.detail.pageTitle': 'User Detail',
+  'imvuGraph.users.detail.idLabel': 'User ID: {id}',
+  'imvuGraph.users.detail.placeholder': 'This is a placeholder for user detail content.',
 
   // Sales - Credit Tab
   'businessAnalysis.sales.creditTab': 'クレジット',

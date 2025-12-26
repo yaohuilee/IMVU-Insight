@@ -12,11 +12,15 @@ export default {
   'menu.dataSync': '資料同步',
   'menu.businessAnalysis': '業務分析',
   'menu.businessAnalysis.customers.buyers': '買家',
+  'menu.businessAnalysis.customers.buyers.detail': '買家詳情',
   'menu.businessAnalysis.customers.recipients': '收件方',
+  'menu.businessAnalysis.customers.recipients.detail': '收件方詳情',
   'menu.businessAnalysis.products': '產品',
+  'menu.businessAnalysis.products.detail': '產品詳情',
   'menu.businessAnalysis.sales': '銷售',
   'menu.imvuGraph': 'IMVU 圖譜',
   'menu.imvuGraph.users': 'IMVU 用戶',
+  'menu.imvuGraph.users.detail': '用戶詳情',
   'menu.imvuGraph.relations': '用戶關係',
   'menu.imvuGraph.entityExplorer': '實體探索',
   'menu.system': '系統',
@@ -40,6 +44,20 @@ export default {
   'imvuGraph.users.columns.action.detail': '詳情',
   'businessAnalysis.customers.buyers.pageTitle': '買家',
   'businessAnalysis.customers.recipients.pageTitle': '收件方',
+  
+  // Menu / Breadcrumb labels for detail pages
+  'businessAnalysis.customers.buyers.detail': 'Buyer Detail',
+  'businessAnalysis.customers.recipients.detail': 'Recipient Detail',
+  
+  // Buyers Detail
+  'businessAnalysis.customers.buyers.detail.pageTitle': '買家詳情',
+  'businessAnalysis.customers.buyers.detail.idLabel': '買家ID: {id}',
+  'businessAnalysis.customers.buyers.detail.placeholder': '這是買家詳情內容的佔位符。',
+
+  // Recipients Detail
+  'businessAnalysis.customers.recipients.detail.pageTitle': '收件方詳情',
+  'businessAnalysis.customers.recipients.detail.idLabel': '收件方ID: {id}',
+  'businessAnalysis.customers.recipients.detail.placeholder': '這是收件方詳情內容的佔位符。',
   'businessAnalysis.products.pageTitle': '產品',
 
   // Business Analysis - Products table
@@ -52,6 +70,16 @@ export default {
   'businessAnalysis.products.columns.action': '操作',
   'businessAnalysis.products.action.detail': '詳情',
   'businessAnalysis.sales.pageTitle': '銷售',
+
+  // Product Detail
+  'businessAnalysis.products.detail.pageTitle': 'Product Detail',
+  'businessAnalysis.products.detail.idLabel': 'Product ID: {id}',
+  'businessAnalysis.products.detail.placeholder': 'This is a placeholder for product detail content.',
+
+  // IMVU User Detail
+  'imvuGraph.users.detail.pageTitle': 'User Detail',
+  'imvuGraph.users.detail.idLabel': 'User ID: {id}',
+  'imvuGraph.users.detail.placeholder': 'This is a placeholder for user detail content.',
 
   // Sales - Credit Tab
   'businessAnalysis.sales.creditTab': '點數',

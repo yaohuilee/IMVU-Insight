@@ -12,11 +12,15 @@ export default {
 	'menu.dataSync': 'Data Sync',
 	'menu.businessAnalysis': 'Business Analysis',
 	'menu.businessAnalysis.customers.buyers': 'Buyers',
+	'menu.businessAnalysis.customers.buyers.detail': 'Buyer Detail',
 	'menu.businessAnalysis.customers.recipients': 'Recipients',
+	'menu.businessAnalysis.customers.recipients.detail': 'Recipient Detail',
 	'menu.businessAnalysis.products': 'Products',
+	'menu.businessAnalysis.products.detail': 'Product Detail',
 	'menu.businessAnalysis.sales': 'Sales',
 	'menu.imvuGraph': 'IMVU Graph',
 	'menu.imvuGraph.users': 'IMVU Users',
+	'menu.imvuGraph.users.detail': 'User Detail',
 	'menu.imvuGraph.relations': 'User Relations',
 	'menu.imvuGraph.entityExplorer': 'Entity Explorer',
 	'menu.system': 'System',
@@ -40,6 +44,20 @@ export default {
 	'imvuGraph.users.columns.action.detail': 'Detail',
 	'businessAnalysis.customers.buyers.pageTitle': 'Buyers',
 	'businessAnalysis.customers.recipients.pageTitle': 'Recipients',
+
+	// Menu / Breadcrumb labels for detail pages
+	'businessAnalysis.customers.buyers.detail': 'Buyer Detail',
+	'businessAnalysis.customers.recipients.detail': 'Recipient Detail',
+
+	// Buyers Detail
+	'businessAnalysis.customers.buyers.detail.pageTitle': 'Buyer Detail',
+	'businessAnalysis.customers.buyers.detail.idLabel': 'Buyer ID: {id}',
+	'businessAnalysis.customers.buyers.detail.placeholder': 'This is a placeholder for buyer detail content.',
+
+	// Recipients Detail
+	'businessAnalysis.customers.recipients.detail.pageTitle': 'Recipient Detail',
+	'businessAnalysis.customers.recipients.detail.idLabel': 'Recipient ID: {id}',
+	'businessAnalysis.customers.recipients.detail.placeholder': 'This is a placeholder for recipient detail content.',
 	'businessAnalysis.products.pageTitle': 'Products',
 
 	// Business Analysis - Products table
@@ -51,6 +69,11 @@ export default {
 	'businessAnalysis.products.columns.lastSold': 'Last Sold',
 	'businessAnalysis.products.columns.action': 'Action',
 	'businessAnalysis.products.action.detail': 'Detail',
+
+	// Product Detail
+	'businessAnalysis.products.detail.pageTitle': 'Product Detail',
+	'businessAnalysis.products.detail.idLabel': 'Product ID: {id}',
+	'businessAnalysis.products.detail.placeholder': 'This is a placeholder for product detail content.',
 	'businessAnalysis.sales.pageTitle': 'Sales',
 
 	// Sales - Credit Tab
@@ -58,6 +81,11 @@ export default {
 	'businessAnalysis.sales.cashTab': 'Cash',
 	'businessAnalysis.sales.creditTab.headerTitle': 'Credit Transactions',
 	'businessAnalysis.sales.creditTab.loadFailed': 'Failed to load credit transactions',
+
+	// IMVU User Detail
+	'imvuGraph.users.detail.pageTitle': 'User Detail',
+	'imvuGraph.users.detail.idLabel': 'User ID: {id}',
+	'imvuGraph.users.detail.placeholder': 'This is a placeholder for user detail content.',
 	'businessAnalysis.sales.columns.transaction_id': 'ID',
 	'businessAnalysis.sales.columns.transaction_time': 'Time',
 	'businessAnalysis.sales.columns.product': 'Product',

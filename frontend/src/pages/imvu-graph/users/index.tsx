@@ -42,8 +42,8 @@ const Users: React.FC = () => {
             dataIndex: 'action',
             valueType: 'option',
             width: 80,
-            render: () => (
-                <Link to="#">
+            render: (_, record) => (
+                <Link to={`/imvu-graph/users/${record.id}`}>
                     {formatMessage({ id: 'imvuGraph.users.columns.action.detail' })}
                 </Link>
             ),

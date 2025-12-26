@@ -47,18 +47,18 @@ const Products: React.FC = () => {
 			valueType: 'dateTime',
 			width: 180,
 		},
-		{
-			align: 'center',
-			title: formatMessage({ id: 'businessAnalysis.products.columns.action' }),
-			dataIndex: 'action',
-			valueType: 'option',
-			width: 80,
-			render: () => (
-				<Link to="#">
-					{formatMessage({ id: 'businessAnalysis.products.action.detail' })}
-				</Link>
-			),
-		}
+		 {
+		   align: 'center',
+		   title: formatMessage({ id: 'businessAnalysis.products.columns.action' }),
+		   dataIndex: 'action',
+		   valueType: 'option',
+		   width: 80,
+		   render: (_, record) => (
+		     <Link to={`/business-analysis/products/${record.product_id}`}>
+		       {formatMessage({ id: 'businessAnalysis.products.action.detail' })}
+		     </Link>
+		   ),
+		 }
 	];
 
 	return (

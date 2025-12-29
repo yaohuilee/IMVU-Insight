@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, List, Tuple
 from datetime import datetime
 
-from sqlalchemy import select, func, asc, desc
+from sqlalchemy import select, func, asc, desc, or_, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ImvuUser
@@ -57,7 +57,11 @@ class ImvuUserService:
         return res.scalars().first()
 
     async def list_paginated(
-        self, page: int = 1, per_page: int = 50, orders: Optional[list] = None
+        self,
+        page: int = 1,
+        per_page: int = 50,
+        orders: Optional[list] = None,
+        keyword: Optional[str] = None,
     ) -> Tuple[List[ImvuUser], int]:
         """Return (items, total_count) for given `page` (1-based) and `per_page`.
 
@@ -70,6 +74,17 @@ class ImvuUserService:
         offset = (page - 1) * per_page
 
         stmt = select(ImvuUser)
+
+        # apply keyword filter when provided (fuzzy match on user_name OR user_id)
+        if keyword:
+            kw = keyword.strip()
+            if kw:
+                stmt = stmt.where(
+                    or_(
+                        ImvuUser.user_name.ilike(f"%{kw}%"),
+                        cast(ImvuUser.user_id, String).ilike(f"%{kw}%"),
+                    )
+                )
 
         # build ordering
         order_cols = []
@@ -113,13 +128,23 @@ class ImvuUserService:
         if order_cols:
             stmt = stmt.order_by(*order_cols)
         else:
-            stmt = stmt.order_by(desc(ImvuUser.user_id))
+            stmt = stmt.order_by(desc(ImvuUser.last_seen_at))
 
         stmt = stmt.offset(offset).limit(per_page)
         res = await self.session.execute(stmt)
         items = res.scalars().all()
 
         count_stmt = select(func.count()).select_from(ImvuUser)
+        if keyword:
+            kw = keyword.strip()
+            if kw:
+                count_stmt = count_stmt.where(
+                    or_(
+                        ImvuUser.user_name.ilike(f"%{kw}%"),
+                        cast(ImvuUser.user_id, String).ilike(f"%{kw}%"),
+                    )
+                )
+
         cnt_res = await self.session.execute(count_stmt)
         total = int(cnt_res.scalar_one())
         return items, total

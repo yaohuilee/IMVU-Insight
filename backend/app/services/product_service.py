@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple
 from decimal import Decimal
 from datetime import datetime
 
-from sqlalchemy import select, func, asc, desc
+from sqlalchemy import select, func, asc, desc, or_, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Product
@@ -70,12 +70,29 @@ class ProductService:
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
-    async def list_paginated(self, page: int = 1, per_page: int = 50, orders: Optional[list] = None) -> Tuple[List[Product], int]:
+    async def list_paginated(
+        self,
+        page: int = 1,
+        per_page: int = 50,
+        orders: Optional[list] = None,
+        keyword: Optional[str] = None,
+    ) -> Tuple[List[Product], int]:
         """Return (items, total_count) for given `page` (1-based) and `per_page`."""
         if page < 1:
             page = 1
         offset = (page - 1) * per_page
         stmt = select(Product)
+
+        # apply keyword filter when provided (fuzzy match on product_name OR product_id)
+        if keyword:
+            kw = keyword.strip()
+            if kw:
+                stmt = stmt.where(
+                    or_(
+                        Product.product_name.ilike(f"%{kw}%"),
+                        cast(Product.product_id, String).ilike(f"%{kw}%"),
+                    )
+                )
 
         order_cols = []
         if orders:
@@ -114,13 +131,35 @@ class ProductService:
         if order_cols:
             stmt = stmt.order_by(*order_cols)
         else:
-            stmt = stmt.order_by(Product.product_id)
+            # default: order by last sold (most recent first)
+            from app.models import IncomeTransaction
+
+            subq = (
+                select(
+                    IncomeTransaction.product_id.label("product_id"),
+                    func.max(IncomeTransaction.transaction_time).label("last_sold"),
+                )
+                .group_by(IncomeTransaction.product_id)
+                .subquery()
+            )
+
+            stmt = stmt.outerjoin(subq, Product.product_id == subq.c.product_id).order_by(desc(subq.c.last_sold))
 
         stmt = stmt.offset(offset).limit(per_page)
         res = await self.session.execute(stmt)
         items = res.scalars().all()
 
         count_stmt = select(func.count()).select_from(Product)
+        if keyword:
+            kw = keyword.strip()
+            if kw:
+                count_stmt = count_stmt.where(
+                    or_(
+                        Product.product_name.ilike(f"%{kw}%"),
+                        cast(Product.product_id, String).ilike(f"%{kw}%"),
+                    )
+                )
+
         cnt_res = await self.session.execute(count_stmt)
         total = int(cnt_res.scalar_one())
         return items, total

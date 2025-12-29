@@ -23,6 +23,7 @@ class PaginationParams(BaseModel):
     page: int = Field(1, ge=1, description="Page number (1-based)")
     page_size: int = Field(50, ge=1, le=200, description="Items per page")
     orders: list[OrderItem] = []
+    keyword: str | None = None
 
 
 class ImvuUserSummary(BaseModel):
@@ -53,7 +54,7 @@ async def list_imvu_users(
 
     svc = ImvuUserService(session)
     items, total = await svc.list_paginated(
-        page=params.page, per_page=params.page_size, orders=params.orders
+        page=params.page, per_page=params.page_size, orders=params.orders, keyword=getattr(params, "keyword", None)
     )
 
     result_items = [

@@ -13,17 +13,26 @@ const Users: React.FC = () => {
 
     const columns: ProColumns<any>[] = [
         {
+            title: formatMessage({ id: 'businessAnalysis.sales.columns.keyword' }),
+            dataIndex: 'keyword',
+            valueType: 'text',
+            hideInTable: true,
+            hideInSearch: false,
+        },
+        {
             title: formatMessage({ id: 'imvuGraph.users.columns.id' }),
             dataIndex: 'id',
             key: 'id',
             width: 100,
             sorter: true,
+            hideInSearch: true
         },
         {
             title: formatMessage({ id: 'imvuGraph.users.columns.name' }),
             dataIndex: 'name',
             key: 'name',
             sorter: true,
+            hideInSearch: true
         },
         {
             title: formatMessage({ id: 'imvuGraph.users.columns.firstSeen' }),
@@ -32,6 +41,7 @@ const Users: React.FC = () => {
             valueType: 'dateTime',
             width: 180,
             sorter: true,
+            hideInSearch: true
         },
         {
             title: formatMessage({ id: 'imvuGraph.users.columns.lastSeen' }),
@@ -40,6 +50,7 @@ const Users: React.FC = () => {
             valueType: 'dateTime',
             width: 180,
             sorter: true,
+            hideInSearch: true
         },
         {
             align: 'center',
@@ -64,15 +75,15 @@ const Users: React.FC = () => {
                 <ProTable<INSIGHT_API.ImvuUserSummary>
                     columns={columns}
                     rowKey="id"
-                    search={false}
+                    search={{ filterType: 'light' }}
                     pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
                     request={async (params = {}, sort: Record<string, SortOrder | null> = {}) => {
                         const { current, pageSize, ...rest } = params as any;
                         const order: INSIGHT_API.OrderItem[] = Object.keys(sort).length
                             ? Object.entries(sort).map(([property, direction]) => ({
-                                  property,
-                                  direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
-                              }))
+                                property,
+                                direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
+                            }))
                             : [];
                         try {
                             const body: INSIGHT_API.PaginationParams = {

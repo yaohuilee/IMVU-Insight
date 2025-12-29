@@ -56,7 +56,9 @@ async def list_products(
     """Return paginated products (only summary fields). Parameters are passed as an object via `Depends` for future extension."""
 
     svc = ProductService(session)
-    items, total = await svc.list_paginated(page=params.page, per_page=params.page_size, orders=params.orders)
+    items, total = await svc.list_paginated(
+        page=params.page, per_page=params.page_size, orders=params.orders, keyword=getattr(params, "keyword", None)
+    )
 
     result_items = [
         ProductSummary(

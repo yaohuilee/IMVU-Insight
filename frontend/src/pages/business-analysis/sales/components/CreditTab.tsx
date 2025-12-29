@@ -20,7 +20,7 @@ const CreditTab: React.FC = () => {
             dataIndex: 'keyword',
             valueType: 'text',
             hideInTable: true,
-            hideInSearch: true,
+            hideInSearch: false,
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.transaction_id', defaultMessage: 'ID' }),

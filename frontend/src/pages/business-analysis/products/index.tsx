@@ -12,16 +12,25 @@ const Products: React.FC = () => {
 
 	const columns: ProColumns<any>[] = [
 		{
+			title: formatMessage({ id: 'businessAnalysis.sales.columns.keyword' }),
+			dataIndex: 'keyword',
+			valueType: 'text',
+			hideInTable: true,
+			hideInSearch: false,
+		},
+		{
 			title: formatMessage({ id: 'businessAnalysis.products.columns.id', defaultMessage: 'ID' }),
 			dataIndex: 'id',
 			width: 80,
 			sorter: true,
+			hideInSearch: true,
 		},
 		{
 			title: formatMessage({ id: 'businessAnalysis.products.columns.name', defaultMessage: 'Name' }),
 			dataIndex: 'name',
 			ellipsis: true,
 			sorter: true,
+			hideInSearch: true,
 		},
 		{
 			align: 'center',
@@ -29,6 +38,7 @@ const Products: React.FC = () => {
 			dataIndex: 'visible',
 			valueType: 'switch',
 			width: 80,
+			hideInSearch: true,
 		},
 		{
 			align: 'right',
@@ -36,6 +46,7 @@ const Products: React.FC = () => {
 			dataIndex: 'price',
 			width: 80,
 			sorter: true,
+			hideInSearch: true,
 		},
 		{
 			align: 'center',
@@ -44,6 +55,7 @@ const Products: React.FC = () => {
 			valueType: 'dateTime',
 			width: 180,
 			sorter: true,
+			hideInSearch: true,
 		},
 		{
 			align: 'center',
@@ -52,19 +64,20 @@ const Products: React.FC = () => {
 			valueType: 'dateTime',
 			width: 180,
 			sorter: true,
+			hideInSearch: true,
 		},
-		 {
-		   align: 'center',
-		   title: formatMessage({ id: 'businessAnalysis.products.columns.action' }),
-		   dataIndex: 'action',
-		   valueType: 'option',
-		   width: 80,
-		   render: (_, record) => (
-		     <Link to={`/business-analysis/products/${record.product_id}`}>
-		       {formatMessage({ id: 'businessAnalysis.products.action.detail' })}
-		     </Link>
-		   ),
-		 }
+		{
+			align: 'center',
+			title: formatMessage({ id: 'businessAnalysis.products.columns.action' }),
+			dataIndex: 'action',
+			valueType: 'option',
+			width: 80,
+			render: (_, record) => (
+				<Link to={`/business-analysis/products/${record.product_id}`}>
+					{formatMessage({ id: 'businessAnalysis.products.action.detail' })}
+				</Link>
+			),
+		}
 	];
 
 	return (
@@ -80,9 +93,9 @@ const Products: React.FC = () => {
 						const { current, pageSize, ...rest } = params as any;
 						const order: INSIGHT_API.OrderItem[] = Object.keys(sort).length
 							? Object.entries(sort).map(([property, direction]) => ({
-								  property,
-								  direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
-							  }))
+								property,
+								direction: direction === 'ascend' ? 'ASC' : direction === 'descend' ? 'DESC' : undefined,
+							}))
 							: [];
 						const res = await listProducts({
 							page: current || 1,
@@ -99,7 +112,7 @@ const Products: React.FC = () => {
 						};
 					}}
 					pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-					search={false}
+					search={{ filterType: 'light' }}
 				/>
 			</PageContainer>
 		</>

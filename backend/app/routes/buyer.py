@@ -58,7 +58,9 @@ async def list_buyers(
     """Return paginated buyer aggregated stats."""
 
     svc = BuyerService(session)
-    items, total = await svc.list_paginated(page=params.page, per_page=params.page_size, orders=params.orders)
+    items, total = await svc.list_paginated(
+        page=params.page, per_page=params.page_size, orders=params.orders, keyword=getattr(params, "keyword", None)
+    )
 
     result_items = [
         BuyerSummary(

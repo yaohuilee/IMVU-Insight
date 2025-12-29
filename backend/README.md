@@ -1,13 +1,19 @@
-
 # IMVU Insight Backend
 
-A FastAPI backend service that parses IMVU XML exports, exposes analytics/metrics APIs, and connects to MySQL for persistence.
+FastAPI service for importing IMVU export files, persisting to MySQL, and serving analytics APIs.
+
+## Features
+
+- Upload product list and income log XML via `/data-sync`
+- Store original uploads in `backend/data/uploads`
+- APIs for products, income transactions, buyers, recipients, and IMVU users
+- Health checks and Swagger docs
 
 ## Tech Stack
 
 - FastAPI
-- SQLAlchemy 2.x (Async) + MySQL (asyncmy)
-- Pandas + lxml (data processing / XML parsing)
+- SQLAlchemy 2.x (async) + MySQL (asyncmy)
+- Pandas, lxml, python-multipart
 
 ## Project Layout (Core)
 
@@ -18,11 +24,13 @@ backend/
     core/
       config.py        # settings (YAML config files)
       db.py            # async DB engine/session dependencies
-    models/            # ORM models (to be added)
-    services/          # business logic (to be added)
+    models/            # ORM models
+    routes/            # API routers
+    services/          # business logic
   config/
     config.dev.yaml    # development config
     config.prod.yaml   # production config
+  data/uploads/        # archived uploads
   pyproject.toml
   README.md
 ```
@@ -74,7 +82,7 @@ uv sync
 
 Notes:
 
-- `uv sync` will create/use a local virtual environment and install dependencies.
+- `uv sync` will create or use a local virtual environment and install dependencies.
 - To install without dev dependencies: `uv sync --no-dev`
 
 ## Run Locally (Development)
@@ -83,11 +91,19 @@ Notes:
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Endpoints:
+## Key Endpoints
 
-- `GET http://localhost:8000/health` — service health check
-- `GET http://localhost:8000/health/db` — database connectivity check (requires valid MySQL config)
-- `GET http://localhost:8000/docs` — Swagger UI
+- `GET /health`
+- `GET /health/db`
+- `GET /docs`
+- `POST /data-sync/product/import`
+- `POST /data-sync/income/import`
+- `GET /data-sync/list`
+- `POST /product/list`
+- `POST /income_transaction/list`
+- `POST /buyer/list`
+- `POST /recipient/list`
+- `POST /imvu_user/list`
 
 ## Quality (Optional)
 
@@ -99,7 +115,6 @@ uv run pytest
 
 ## Suggested Next Steps
 
-- Define ORM models in `app/models/` (e.g., products, income logs)
-- Implement the ingestion pipeline in `app/services/`: XML -> DataFrame -> DB / metrics
-- Add versioned APIs under `/api/v1` for metrics, products, revenue, and trends
-
+- Add aggregation endpoints for trends and lifecycle metrics
+- Expand graph and relationship APIs
+- Add data quality and snapshot summaries

@@ -1,17 +1,23 @@
 # IMVU Insight
 
-A data visualization and insight platform for IMVU creators, built with FastAPI & Ant Design.
+A data visualization and insight platform for IMVU creators, built with FastAPI and an Ant Design/Umi Max frontend.
 
 ---
 
 ## Overview
 
-IMVU Insight is a data-driven web application designed to help IMVU creators
-better understand their products, revenue streams, and performance trends
-through interactive visualizations and analytical insights.
+IMVU Insight turns IMVU export files (product list + income log) into structured data, APIs, and dashboards. The backend handles parsing and persistence; the frontend provides data management and analysis views.
 
-The project focuses on transforming raw IMVU backend export data (XML)
-into structured, explorable, and actionable insights.
+---
+
+## What's Implemented
+
+- Upload + parse IMVU XML exports for product list and income log
+- Data sync records saved to DB and original files archived in `backend/data/uploads`
+- Core domain models and APIs for products, income transactions, buyers, recipients, and IMVU users
+- FastAPI health endpoints and Swagger docs
+- Umi Max frontend with login, dashboard, data sync UI, business analysis pages, and IMVU graph pages
+- Multi-language UI strings (en-US, es-ES, ja-JP, zh-CN, zh-TW)
 
 ---
 
@@ -19,10 +25,11 @@ into structured, explorable, and actionable insights.
 
 ```text
 IMVU-Insight/
-├── backend/  # FastAPI backend services
-├── frontend/ # Ant Design based frontend (React)
-├── docs/     # Design docs, data schema, notes
-└── README.md
+  backend/   # FastAPI backend services + data processing
+  frontend/  # Umi Max + Ant Design frontend
+  data/      # Sample IMVU exports
+  docs/      # Data model design notes
+  README.md
 ```
 
 ---
@@ -30,37 +37,39 @@ IMVU-Insight/
 ## Tech Stack
 
 ### Backend
-- Python
-- FastAPI
-- Pandas (data processing)
-- XML parsing (IMVU export data)
+- Python + FastAPI
+- SQLAlchemy (async) + MySQL (asyncmy)
+- Pandas, lxml, python-multipart
 
 ### Frontend
-- React
-- Ant Design
-- ECharts (planned)
+- React + TypeScript
+- Umi Max (`@umijs/max`)
+- Ant Design + Ant Design Pro Components
+
+### Tooling
+- uv (Python deps)
+- Yarn 4 (frontend)
 
 ---
 
 ## Current Status
 
-- Project scaffolding initialized
-- Repository structure created
-- Data source: IMVU XML exports (income log & product list)
+- [x] Backend data sync uploads and raw storage
+- [x] APIs for products, income transactions, buyers/recipients, and IMVU users
+- [x] Frontend navigation + data management + business analysis scaffolding
+- [ ] Analytics charts (sales trends, product lifecycle)
+- [ ] Graph relationships visualization
+- [ ] Data quality / snapshots module
 
 ---
 
-## Roadmap (Initial)
+## Docs & Samples
 
-- [ ] Parse IMVU XML data into structured models
-- [ ] Backend API for metrics & analytics
-- [ ] Revenue & product performance dashboard
-- [ ] Product lifecycle and trend analysis
-- [ ] Interactive filtering & exploration
+- Data model design: `docs/data-model-design.*`
+- Sample exports: `data/samples`
 
 ---
 
-## Notes
+## Getting Started
 
-This project is currently under active development and serves as a
-personal exploration and engineering project.
+See `backend/README.md` and `frontend/README.md` for local setup and commands.

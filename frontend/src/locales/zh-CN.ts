@@ -86,6 +86,7 @@ export default {
 	'businessAnalysis.sales.cashTab': '现金',
 	'businessAnalysis.sales.creditTab.headerTitle': '点数交易',
 	'businessAnalysis.sales.creditTab.loadFailed': '加载点数交易失败',
+	'businessAnalysis.sales.columns.keyword': '关键字',
 	'businessAnalysis.sales.columns.transaction_id': 'ID',
 	'businessAnalysis.sales.columns.transaction_time': '时间',
 	'businessAnalysis.sales.columns.product': '产品',

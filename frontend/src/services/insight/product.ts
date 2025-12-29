@@ -19,3 +19,19 @@ export async function listProducts(
     },
   );
 }
+
+/** List product options for select inputs Return select options for products. If `keyword` is provided and non-empty, search products by name or id.
+Otherwise return the most-recent products by sale time. POST /product/options */
+export async function listProductOptions(
+  body: INSIGHT_API.ProductOptionsRequest,
+  options?: { [key: string]: any },
+) {
+  return request<INSIGHT_API.ProductOption[]>(`/insight/api/product/options`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}

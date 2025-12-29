@@ -86,6 +86,7 @@ export default {
   'businessAnalysis.sales.cashTab': '現金',
   'businessAnalysis.sales.creditTab.headerTitle': '點數交易',
   'businessAnalysis.sales.creditTab.loadFailed': '載入點數交易失敗',
+  'businessAnalysis.sales.columns.keyword': '關鍵字',
   'businessAnalysis.sales.columns.transaction_id': 'ID',
   'businessAnalysis.sales.columns.transaction_time': '時間',
   'businessAnalysis.sales.columns.product': '產品',

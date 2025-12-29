@@ -19,3 +19,19 @@ export async function listBuyers(
     },
   );
 }
+
+/** List buyer options for select inputs Return select options for buyers. If `keyword` is provided and non-empty, search users by name or id.
+Otherwise return the most-recent 20 buyers by payment time. POST /buyer/options */
+export async function listBuyerOptions(
+  body: INSIGHT_API.BuyerOptionsRequest,
+  options?: { [key: string]: any },
+) {
+  return request<INSIGHT_API.BuyerOption[]>(`/insight/api/buyer/options`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}

@@ -5,6 +5,9 @@ import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
 import { listIncomeTransactions } from '@/services/insight/incomeTransaction';
+import { listBuyerOptions } from '@/services/insight/buyer';
+import { listRecipientOptions } from '@/services/insight/recipient';
+import { listProductOptions } from '@/services/insight/product';
 
 const CreditTab: React.FC = () => {
 
@@ -13,11 +16,19 @@ const CreditTab: React.FC = () => {
 
     const columns: ProColumns<INSIGHT_API.IncomeTransactionItem>[] = [
         {
+            title: formatMessage({ id: 'businessAnalysis.sales.columns.keyword' }),
+            dataIndex: 'keyword',
+            valueType: 'text',
+            hideInTable: true,
+            hideInSearch: true,
+        },
+        {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.transaction_id', defaultMessage: 'ID' }),
             dataIndex: 'transaction_id',
             key: 'transaction_id',
             width: 100,
             sorter: true,
+            hideInSearch: true,
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.transaction_time', defaultMessage: 'Time' }),
@@ -26,10 +37,26 @@ const CreditTab: React.FC = () => {
             valueType: 'dateTime',
             width: 160,
             sorter: true,
+            hideInSearch: true,
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.product', defaultMessage: 'Product' }),
             dataIndex: 'product_id',
+            valueType: 'select',
+            fieldProps: {
+                showSearch: true,
+                mode: 'multiple',
+                dropdownMatchSelectWidth: false,
+            },
+            request: async (params: any) => {
+                const keyword = (params?.keyWords ?? params?.keyword ?? '').toString();
+                try {
+                    const resp = await listProductOptions({ keyword: keyword || undefined, limit: 50 });
+                    return (resp || []).map((o: any) => ({ label: o.label ?? String(o.value), value: o.value }));
+                } catch (e) {
+                    return [];
+                }
+            },
             sorter: true,
             render: (_: any, record: any) => {
                 const name = record?.product?.name ?? record?.product_id;
@@ -43,6 +70,22 @@ const CreditTab: React.FC = () => {
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.buyer', defaultMessage: 'Buyer' }),
             dataIndex: 'buyer_user_id',
+            valueType: 'select',
+            fieldProps: {
+                showSearch: true,
+                mode: 'multiple',
+                dropdownMatchSelectWidth: false
+            },
+            // dynamically load options for the select (search by name or id)
+            request: async (params: any) => {
+                const keyword = (params?.keyWords ?? params?.keyword ?? '').toString();
+                try {
+                    const resp = await listBuyerOptions({ keyword: keyword || undefined, limit: 50 });
+                    return (resp || []).map((o: any) => ({ label: o.label ?? String(o.value), value: o.value }));
+                } catch (e) {
+                    return [];
+                }
+            },
             sorter: true,
             render: (_: any, record: any) => {
                 const name = record?.buyer_user?.name ?? record?.buyer_user_id;
@@ -56,6 +99,23 @@ const CreditTab: React.FC = () => {
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.recipient', defaultMessage: 'Recipient' }),
             dataIndex: 'recipient_user_id',
+            valueType: 'select',
+            fieldProps: {
+                showSearch: true,
+                mode: 'multiple',
+                dropdownMatchSelectWidth: false,
+                debounceTime: 1000,
+                debounceSearch: true,
+            },
+            request: async (params: any) => {
+                const keyword = (params?.keyWords ?? params?.keyword ?? '').toString();
+                try {
+                    const resp = await listRecipientOptions({ keyword: keyword || undefined, limit: 50 });
+                    return (resp || []).map((o: any) => ({ label: o.label ?? String(o.value), value: o.value }));
+                } catch (e) {
+                    return [];
+                }
+            },
             sorter: true,
             render: (_: any, record: any) => {
                 const name = record?.recipient_user?.name ?? record?.recipient_user_id;
@@ -68,12 +128,13 @@ const CreditTab: React.FC = () => {
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.paid', defaultMessage: 'Paid' }),
+            hideInSearch: true,
             children: [
                 {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.paid.credits', defaultMessage: 'Credits' }),
                     dataIndex: 'paid_credits',
                     key: 'paid_credits',
-                    width: 100,
+                    width: 120,
                     align: 'right',
                     sorter: true,
                 },
@@ -81,7 +142,7 @@ const CreditTab: React.FC = () => {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.paid.promoCredits', defaultMessage: 'Promo Credits' }),
                     dataIndex: 'paid_promo_credits',
                     key: 'paid_promo_credits',
-                    width: 130,
+                    width: 150,
                     align: 'right',
                     sorter: true,
                 },
@@ -89,7 +150,7 @@ const CreditTab: React.FC = () => {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.paid.totalCredits', defaultMessage: 'Total Credits' }),
                     dataIndex: 'paid_total_credits',
                     key: 'paid_total_credits',
-                    width: 120,
+                    width: 150,
                     align: 'right',
                     sorter: true,
                 },
@@ -97,12 +158,13 @@ const CreditTab: React.FC = () => {
         },
         {
             title: formatMessage({ id: 'businessAnalysis.sales.columns.income', defaultMessage: 'Income' }),
+            hideInSearch: true,
             children: [
                 {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.income.credits', defaultMessage: 'Credits' }),
                     dataIndex: 'income_credits',
                     key: 'income_credits',
-                    width: 100,
+                    width: 120,
                     align: 'right',
                     sorter: true,
                 },
@@ -110,7 +172,7 @@ const CreditTab: React.FC = () => {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.income.promoCredits', defaultMessage: 'Promo Credits' }),
                     dataIndex: 'income_promo_credits',
                     key: 'income_promo_credits',
-                    width: 130,
+                    width: 150,
                     align: 'right',
                     sorter: true,
                 },
@@ -118,7 +180,7 @@ const CreditTab: React.FC = () => {
                     title: formatMessage({ id: 'businessAnalysis.sales.columns.income.totalCredits', defaultMessage: 'Total Credits' }),
                     dataIndex: 'income_total_credits',
                     key: 'income_total_credits',
-                    width: 120,
+                    width: 150,
                     align: 'right',
                     sorter: true,
                 },
@@ -133,7 +195,7 @@ const CreditTab: React.FC = () => {
             rowKey="transaction_id"
             actionRef={actionRef}
             pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
-            search={false}
+            search={{ filterType: 'light' }}
             request={async (params: any = {}, sort: Record<string, SortOrder | null> = {}) => {
                 const { current, pageSize, ...rest } = params as any;
 

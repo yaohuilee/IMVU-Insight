@@ -19,3 +19,22 @@ export async function listRecipients(
     },
   );
 }
+
+/** List recipient options for select inputs Return select options for recipients. If `keyword` provided, search users by name or id.
+Otherwise return the most-recent recipients by payment time. POST /recipient/options */
+export async function listRecipientOptions(
+  body: INSIGHT_API.RecipientOptionsRequest,
+  options?: { [key: string]: any },
+) {
+  return request<INSIGHT_API.RecipientOption[]>(
+    `/insight/api/recipient/options`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    },
+  );
+}

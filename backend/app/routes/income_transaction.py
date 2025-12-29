@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.core.db import get_db_session
 from app.services.income_transaction_service import IncomeTransactionService
-from app.routes.imvu_user import ImvuUserSummary, PaginationParams
+from app.routes.imvu_user import ImvuUserSummary, OrderItem
 from app.routes.product import ProductSummary
 
 
@@ -51,6 +51,16 @@ class PaginatedIncomeTransactionResponse(BaseModel):
     items: list[IncomeTransactionItem]
 
 
+class IncomeTransactionPaginationParams(BaseModel):
+    page: int = Field(1, ge=1, description="Page number (1-based)")
+    page_size: int = Field(50, ge=1, le=200, description="Items per page")
+    orders: list[OrderItem] = []
+
+    product_id: list[int] | None = None
+    buyer_user_id: list[int] | None = None
+    recipient_user_id: list[int] | None = None
+
+
 @router.post(
     "/list",
     operation_id="listIncomeTransactions",
@@ -58,13 +68,18 @@ class PaginatedIncomeTransactionResponse(BaseModel):
     response_model=PaginatedIncomeTransactionResponse,
 )
 async def list_income_transactions(
-    params: PaginationParams,
+    params: IncomeTransactionPaginationParams,
     session: AsyncSession = Depends(get_db_session),
 ):
     svc = IncomeTransactionService(session)
 
     rows, total = await svc.list_paginated_with_relations(
-        page=params.page, per_page=params.page_size, orders=params.orders
+        page=params.page,
+        per_page=params.page_size,
+        orders=params.orders,
+        product_ids=params.product_id,
+        buyer_user_ids=params.buyer_user_id,
+        recipient_user_ids=params.recipient_user_id,
     )
 
     result_items: list[IncomeTransactionItem] = []

@@ -113,7 +113,7 @@ class IncomeTransactionService:
         offset = (page - 1) * per_page
         stmt = (
             select(IncomeTransaction)
-            .order_by(IncomeTransaction.transaction_id)
+            .order_by(desc(IncomeTransaction.transaction_id))
             .offset(offset)
             .limit(per_page)
         )
@@ -126,7 +126,13 @@ class IncomeTransactionService:
         return items, total
 
     async def list_paginated_with_relations(
-        self, page: int = 1, per_page: int = 50, orders: Optional[list] = None
+        self,
+        page: int = 1,
+        per_page: int = 50,
+        orders: Optional[list] = None,
+        product_ids: Optional[list[int]] = None,
+        buyer_user_ids: Optional[list[int]] = None,
+        recipient_user_ids: Optional[list[int]] = None,
     ) -> Tuple[List[tuple], int]:
         """Return list of tuples (IncomeTransaction, Product|None, buyer ImvuUser|None, recipient ImvuUser|None) and total count.
 
@@ -146,16 +152,28 @@ class IncomeTransactionService:
             .join(Recipient, IncomeTransaction.recipient_user_id == Recipient.user_id, isouter=True)
         )
 
+        # build optional WHERE clauses for IN-filters (non-empty lists only)
+        where_clauses = []
+        if product_ids:
+            where_clauses.append(IncomeTransaction.product_id.in_(product_ids))
+        if buyer_user_ids:
+            where_clauses.append(IncomeTransaction.buyer_user_id.in_(buyer_user_ids))
+        if recipient_user_ids:
+            where_clauses.append(IncomeTransaction.recipient_user_id.in_(recipient_user_ids))
+
+        if where_clauses:
+            stmt = stmt.where(*where_clauses)
+
         # build ordering from `orders` similar to ImvuUserService
         order_cols = []
         if orders:
             for o in orders:
                 if hasattr(o, "property"):
                     prop = getattr(o, "property")
-                    direction = (getattr(o, "direction", None) or "ASC").upper()
+                    direction = (getattr(o, "direction", None) or "DESC").upper()
                 else:
                     prop = o.get("property")
-                    direction = (o.get("direction") or "ASC").upper()
+                    direction = (o.get("direction") or "DESC").upper()
 
                 # normalize comma-separated indices (e.g. 'buyer_user,name') to dot notation
                 if isinstance(prop, str):
@@ -192,7 +210,7 @@ class IncomeTransactionService:
         if order_cols:
             stmt = stmt.order_by(*order_cols)
         else:
-            stmt = stmt.order_by(IncomeTransaction.transaction_id)
+            stmt = stmt.order_by(desc(IncomeTransaction.transaction_id))
 
         stmt = stmt.offset(offset).limit(per_page)
 
@@ -200,6 +218,8 @@ class IncomeTransactionService:
         rows = res.all()
 
         count_stmt = select(func.count()).select_from(IncomeTransaction)
+        if where_clauses:
+            count_stmt = count_stmt.where(*where_clauses)
         cnt_res = await self.session.execute(count_stmt)
         total = int(cnt_res.scalar_one())
         return rows, total

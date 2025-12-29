@@ -9,6 +9,20 @@ declare namespace INSIGHT_API {
     file: string;
   };
 
+  type BuyerOption = {
+    /** Value */
+    value: number;
+    /** Label */
+    label?: string | null;
+  };
+
+  type BuyerOptionsRequest = {
+    /** Keyword */
+    keyword?: string | null;
+    /** Limit Maximum number of options to return when using recent buyers fallback */
+    limit?: number;
+  };
+
   type BuyerSummary = {
     /** Id */
     id: number;
@@ -212,6 +226,20 @@ declare namespace INSIGHT_API {
     orders?: OrderItem[];
   };
 
+  type ProductOption = {
+    /** Value */
+    value: number;
+    /** Label */
+    label?: string | null;
+  };
+
+  type ProductOptionsRequest = {
+    /** Keyword */
+    keyword?: string | null;
+    /** Limit Maximum number of options to return when using recent products fallback */
+    limit?: number;
+  };
+
   type ProductSummary = {
     /** Id */
     id: number;
@@ -225,6 +253,20 @@ declare namespace INSIGHT_API {
     first_sold_at?: string | null;
     /** Last Sold At */
     last_sold_at?: string | null;
+  };
+
+  type RecipientOption = {
+    /** Value */
+    value: number;
+    /** Label */
+    label?: string | null;
+  };
+
+  type RecipientOptionsRequest = {
+    /** Keyword */
+    keyword?: string | null;
+    /** Limit Maximum number of options to return when using recent recipients fallback */
+    limit?: number;
   };
 
   type RecipientSummary = {

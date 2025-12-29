@@ -86,6 +86,7 @@ export default {
 	'imvuGraph.users.detail.pageTitle': 'User Detail',
 	'imvuGraph.users.detail.idLabel': 'User ID: {id}',
 	'imvuGraph.users.detail.placeholder': 'This is a placeholder for user detail content.',
+	'businessAnalysis.sales.columns.keyword': 'Keyword',
 	'businessAnalysis.sales.columns.transaction_id': 'ID',
 	'businessAnalysis.sales.columns.transaction_time': 'Time',
 	'businessAnalysis.sales.columns.product': 'Product',

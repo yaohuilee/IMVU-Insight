@@ -86,6 +86,7 @@ export default {
   'businessAnalysis.sales.cashTab': 'キャッシュ',
   'businessAnalysis.sales.creditTab.headerTitle': 'クレジット取引',
   'businessAnalysis.sales.creditTab.loadFailed': 'クレジット取引の読み込みに失敗しました',
+  'businessAnalysis.sales.columns.keyword': 'キーワード',
   'businessAnalysis.sales.columns.transaction_id': 'ID',
   'businessAnalysis.sales.columns.transaction_time': '時間',
   'businessAnalysis.sales.columns.product': '製品',

@@ -18,9 +18,12 @@ class BuyerService:
         per_page: int = 50,
         orders: Optional[list] = None,
         keyword: Optional[str] = None,
+        developer_ids: Optional[list[int]] = None,
     ) -> Tuple[List[dict], int]:
         if page < 1:
             page = 1
+        if developer_ids is not None and len(developer_ids) == 0:
+            return [], 0
         offset = (page - 1) * per_page
         # build expressions so we can reuse them for ordering
         user_id_expr = ImvuUser.user_id.label("user_id")
@@ -51,6 +54,9 @@ class BuyerService:
                 ImvuUser.last_seen_at,
             )
         )
+
+        if developer_ids is not None:
+            stmt = stmt.where(IncomeTransaction.developer_user_id.in_(developer_ids))
 
         # apply keyword filter when provided (fuzzy match on user_name OR user_id)
         if keyword:
@@ -113,6 +119,8 @@ class BuyerService:
         count_stmt = (
             select(func.count(func.distinct(IncomeTransaction.buyer_user_id))).select_from(IncomeTransaction)
         )
+        if developer_ids is not None:
+            count_stmt = count_stmt.where(IncomeTransaction.developer_user_id.in_(developer_ids))
         if keyword:
             kw = keyword.strip()
             if kw:

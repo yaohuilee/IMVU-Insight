@@ -5,13 +5,14 @@ from decimal import Decimal
 from typing import List
 
 from app.routes.imvu_user import OrderItem, PaginationParams
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.db import get_db_session
 from app.services.product_service import ProductService
+from app.services.user_service import UserService
 
 
 router = APIRouter(prefix="/product", tags=["Product"])
@@ -43,6 +44,18 @@ class ProductOptionsRequest(BaseModel):
     limit: int = Field(20, description="Maximum number of options to return when using recent products fallback")
 
 
+async def _get_user_developer_ids(request: Request, session: AsyncSession) -> list[int]:
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    user = await UserService(session).get_by_id(principal.user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    return user.developer_ids
+
+
 @router.post(
     "/list",
     operation_id="listProducts",
@@ -51,13 +64,22 @@ class ProductOptionsRequest(BaseModel):
 )
 async def list_products(
     params: PaginationParams,
+    request: Request,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return paginated products (only summary fields). Parameters are passed as an object via `Depends` for future extension."""
 
+    developer_ids = await _get_user_developer_ids(request, session)
+    if not developer_ids:
+        return PaginatedProductResponse(total=0, page=params.page, page_size=params.page_size, items=[])
+
     svc = ProductService(session)
     items, total = await svc.list_paginated(
-        page=params.page, per_page=params.page_size, orders=params.orders, keyword=getattr(params, "keyword", None)
+        page=params.page,
+        per_page=params.page_size,
+        orders=params.orders,
+        keyword=getattr(params, "keyword", None),
+        developer_ids=developer_ids,
     )
 
     result_items = [
@@ -83,11 +105,16 @@ async def list_products(
 )
 async def list_product_options(
     body: ProductOptionsRequest,
+    request: Request,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return select options for products. If `keyword` is provided and non-empty, search products by name or id.
     Otherwise return the most-recent products by sale time.
     """
+
+    developer_ids = await _get_user_developer_ids(request, session)
+    if not developer_ids:
+        return []
 
     keyword = (body.keyword or "").strip()
     limit = max(1, int(body.limit or 20))
@@ -108,6 +135,7 @@ async def list_product_options(
         else:
             stmt = select(Product.product_id, Product.product_name).where(Product.product_name.ilike(f"%{keyword}%"))
 
+        stmt = stmt.where(Product.developer_user_id.in_(developer_ids))
         stmt = stmt.order_by(Product.product_name).limit(50)
         res = await session.execute(stmt)
         rows = res.mappings().all()
@@ -123,6 +151,7 @@ async def list_product_options(
             IncomeTransaction.product_id.label("product_id"),
             func.max(IncomeTransaction.transaction_time).label("last_sold"),
         )
+        .where(IncomeTransaction.developer_user_id.in_(developer_ids))
         .group_by(IncomeTransaction.product_id)
         .order_by(desc(func.max(IncomeTransaction.transaction_time)))
         .limit(limit)
@@ -132,6 +161,7 @@ async def list_product_options(
     stmt = (
         select(Product.product_id, Product.product_name)
         .join(subq, Product.product_id == subq.c.product_id)
+        .where(Product.developer_user_id.in_(developer_ids))
         .order_by(desc(subq.c.last_sold))
     )
 

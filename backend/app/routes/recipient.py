@@ -5,13 +5,14 @@ from typing import List
 from datetime import datetime
 
 from app.routes.imvu_user import OrderItem, PaginationParams
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.db import get_db_session
 from app.services.recipient_service import RecipientService
+from app.services.user_service import UserService
 
 
 router = APIRouter(prefix="/recipient", tags=["Recipient"])
@@ -52,14 +53,31 @@ class RecipientOptionsRequest(BaseModel):
     response_model=PaginatedRecipientResponse,
 )
 async def list_recipients(
+    request: Request,
     params: PaginationParams,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return paginated recipient aggregated stats."""
 
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    user = await UserService(session).get_by_id(principal.user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    developer_ids = user.developer_ids
+    if not developer_ids:
+        return PaginatedRecipientResponse(total=0, page=params.page, page_size=params.page_size, items=[])
+
     svc = RecipientService(session)
     items, total = await svc.list_paginated(
-        page=params.page, per_page=params.page_size, orders=params.orders, keyword=getattr(params, "keyword", None)
+        page=params.page,
+        per_page=params.page_size,
+        orders=params.orders,
+        keyword=getattr(params, "keyword", None),
+        developer_ids=developer_ids,
     )
 
     result_items = [
@@ -87,11 +105,24 @@ async def list_recipients(
 )
 async def list_recipient_options(
     body: RecipientOptionsRequest,
+    request: Request,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return select options for recipients. If `keyword` provided, search users by name or id.
     Otherwise return the most-recent recipients by payment time.
     """
+
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    user = await UserService(session).get_by_id(principal.user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    developer_ids = user.developer_ids
+    if not developer_ids:
+        return []
 
     keyword = (body.keyword or "").strip()
     limit = max(1, int(body.limit or 20))
@@ -112,6 +143,7 @@ async def list_recipient_options(
         else:
             stmt = select(ImvuUser.user_id, ImvuUser.user_name).where(ImvuUser.user_name.ilike(f"%{keyword}%"))
 
+        stmt = stmt.where(ImvuUser.developer_user_id.in_(developer_ids))
         stmt = stmt.order_by(ImvuUser.user_name).limit(50)
         res = await session.execute(stmt)
         rows = res.mappings().all()
@@ -127,6 +159,7 @@ async def list_recipient_options(
             IncomeTransaction.recipient_user_id.label("recipient_user_id"),
             func.max(IncomeTransaction.transaction_time).label("last_paid"),
         )
+        .where(IncomeTransaction.developer_user_id.in_(developer_ids))
         .group_by(IncomeTransaction.recipient_user_id)
         .order_by(desc(func.max(IncomeTransaction.transaction_time)))
         .limit(limit)

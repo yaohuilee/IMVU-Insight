@@ -17,17 +17,30 @@ class DataSyncImvuUserService:
     def collect_income_user_map(self, records: Sequence[Dict]) -> Dict[int, Dict]:
         """Collect a mapping of numeric user_id -> latest available name from income records.
 
-        Reseller IDs may be non-numeric; only numeric IDs are included.
+        Reseller IDs may be non-numeric; only numeric IDs are included. The developer_id from the
+        source file is retained so we can link imvu users back to the developer that produced the
+        income snapshot.
         """
-        # Map user_id -> {"name": str, "min_dt": datetime|None, "max_dt": datetime|None}
+        # Map user_id -> {"name": str, "min_dt": datetime|None, "max_dt": datetime|None, "developer_id": int|None}
         user_map: Dict[int, Dict] = {}
         for r in records:
             purchase_dt = r.get("purchase_date")
+            dev_id = r.get("developer_id")
 
             # buyer
             bid = r.get("buyer_id")
             if bid is not None:
-                entry = user_map.setdefault(bid, {"name": r.get("buyer_name") or "", "min_dt": None, "max_dt": None})
+                entry = user_map.setdefault(
+                    bid,
+                    {
+                        "name": r.get("buyer_name") or "",
+                        "min_dt": None,
+                        "max_dt": None,
+                        "developer_id": dev_id,
+                    },
+                )
+                if entry.get("developer_id") is None and dev_id is not None:
+                    entry["developer_id"] = dev_id
                 if entry["name"] == "" and (r.get("buyer_name") or ""):
                     entry["name"] = r.get("buyer_name") or ""
                 if isinstance(purchase_dt, datetime):
@@ -39,7 +52,17 @@ class DataSyncImvuUserService:
             # recipient
             rid = r.get("recipient_id")
             if rid is not None:
-                entry = user_map.setdefault(rid, {"name": r.get("recipient_name") or "", "min_dt": None, "max_dt": None})
+                entry = user_map.setdefault(
+                    rid,
+                    {
+                        "name": r.get("recipient_name") or "",
+                        "min_dt": None,
+                        "max_dt": None,
+                        "developer_id": dev_id,
+                    },
+                )
+                if entry.get("developer_id") is None and dev_id is not None:
+                    entry["developer_id"] = dev_id
                 if entry["name"] == "" and (r.get("recipient_name") or ""):
                     entry["name"] = r.get("recipient_name") or ""
                 if isinstance(purchase_dt, datetime):
@@ -55,7 +78,17 @@ class DataSyncImvuUserService:
             except Exception:
                 resid = None
             if resid is not None:
-                entry = user_map.setdefault(resid, {"name": r.get("reseller_name") or "", "min_dt": None, "max_dt": None})
+                entry = user_map.setdefault(
+                    resid,
+                    {
+                        "name": r.get("reseller_name") or "",
+                        "min_dt": None,
+                        "max_dt": None,
+                        "developer_id": dev_id,
+                    },
+                )
+                if entry.get("developer_id") is None and dev_id is not None:
+                    entry["developer_id"] = dev_id
                 if entry["name"] == "" and (r.get("reseller_name") or ""):
                     entry["name"] = r.get("reseller_name") or ""
                 if isinstance(purchase_dt, datetime):
@@ -69,7 +102,7 @@ class DataSyncImvuUserService:
     async def ensure_imvu_users_from_map(self, *, user_id_name_map: Dict[int, Dict], snapshot_date: date) -> None:
         """Create or update ImvuUser rows for given id->info map.
 
-        `user_id_name_map` is expected to map user_id -> {"name": str, "min_dt": datetime|None, "max_dt": datetime|None}.
+        `user_id_name_map` is expected to map user_id -> {"name": str, "min_dt": datetime|None, "max_dt": datetime|None, "developer_id": int|None}.
 
         For existing users: if a record has an earlier `min_dt` than `first_seen_at`, update `first_seen_at`.
         If a record has a later `max_dt` than `last_seen_at`, update `last_seen_at` and the `user_name`.
@@ -88,6 +121,11 @@ class DataSyncImvuUserService:
             name = info.get("name") or None
             min_dt = info.get("min_dt")
             max_dt = info.get("max_dt")
+            dev_id = info.get("developer_id")
+
+            # developer_id is required to link the imvu user back to the owner developer
+            if dev_id is None:
+                continue
 
             # creation fallback times
             create_first = min_dt or snapshot_dt
@@ -95,6 +133,9 @@ class DataSyncImvuUserService:
 
             if uid in existing_users:
                 u = existing_users[uid]
+                existing_dev_id = getattr(u, "developer_user_id", None)
+                if existing_dev_id in (None, 0):
+                    u.developer_user_id = dev_id
                 try:
                     cur_first = u.first_seen_at
                 except Exception:
@@ -114,5 +155,11 @@ class DataSyncImvuUserService:
                     if name:
                         u.user_name = name or u.user_name
             else:
-                new_u = ImvuUser(user_id=uid, user_name=name, first_seen_at=create_first, last_seen_at=create_last)
+                new_u = ImvuUser(
+                    user_id=uid,
+                    user_name=name,
+                    first_seen_at=create_first,
+                    last_seen_at=create_last,
+                    developer_user_id=dev_id,
+                )
                 self.session.add(new_u)

@@ -10,7 +10,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, UploadFile, File, Query, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, Query, HTTPException, Request
 from pydantic import BaseModel
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,6 +69,7 @@ class DataSyncRecordByHashResponse(BaseModel):
     response_model=DataSyncRecordListResponse,
 )
 async def list_data_sync_records(
+    request: Request,
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Page size"),
     type: DataType | None = Query(None, description="Filter by data type"),
@@ -76,8 +77,13 @@ async def list_data_sync_records(
 ):
     """Get paginated DataSyncRecord objects, excluding content."""
 
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    user_id = principal.user_id
+
     svc = DataSyncService(session)
-    records, total = await svc.list(page=page, page_size=page_size, type=type)
+    records, total = await svc.list(page=page, page_size=page_size, type=type, user_id=user_id)
 
     items = [
         DataSyncRecordListItem(
@@ -104,7 +110,7 @@ def _ensure_upload_dir() -> Path:
     return path
 
 
-async def _handle_upload(session: AsyncSession, file: UploadFile, dtype: DataType):
+async def _handle_upload(session: AsyncSession, file: UploadFile, dtype: DataType, user_id: int):
     """Read uploaded file, persist original to disk, and create a record."""
 
     content = await file.read()
@@ -127,6 +133,7 @@ async def _handle_upload(session: AsyncSession, file: UploadFile, dtype: DataTyp
     file_path.write_bytes(content)
 
     svc = DataSyncService(session)
+    # user_id is attached by caller (import endpoints) to track ownership
     record = await svc.create(
         type=dtype,
         filename=safe_name,
@@ -134,6 +141,7 @@ async def _handle_upload(session: AsyncSession, file: UploadFile, dtype: DataTyp
         record_count=int(record_count),
         file_size=file_size,
         content=content,
+        user_id=user_id,
     )
 
     return record, content
@@ -146,12 +154,17 @@ async def _handle_upload(session: AsyncSession, file: UploadFile, dtype: DataTyp
     response_model=DataSyncCreateResponse,
 )
 async def import_product_file(
+    request: Request,
     file: UploadFile = File(..., alias="file"),
     session: AsyncSession = Depends(get_db_session),
 ):
     """Upload a product file and create a data sync record."""
 
-    record, content = await _handle_upload(session, file, DataType.PRODUCT)
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    record, content = await _handle_upload(session, file, DataType.PRODUCT, principal.user_id)
 
     # Extract record fields to avoid lazy loading issues after session commits
     record_id = record.id
@@ -206,12 +219,17 @@ async def import_product_file(
     response_model=DataSyncCreateResponse,
 )
 async def import_income_file(
+    request: Request,
     file: UploadFile = File(..., alias="file"),
     session: AsyncSession = Depends(get_db_session),
 ):
     """Upload an income file and create a data sync record."""
 
-    record, content = await _handle_upload(session, file, DataType.INCOME)
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    record, content = await _handle_upload(session, file, DataType.INCOME, principal.user_id)
 
     # Extract record fields to avoid lazy loading issues after session commits
     record_id = record.id
@@ -273,6 +291,7 @@ async def import_income_file(
     response_model=DataSyncRecordByHashResponse,
 )
 async def get_data_sync_record_by_hash(
+    request: Request,
     hash: str = Query(..., description="File hash to check"),
     session: AsyncSession = Depends(get_db_session),
 ):
@@ -283,8 +302,12 @@ async def get_data_sync_record_by_hash(
     found, returns `{ "exists": false }`.
     """
 
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
     svc = DataSyncService(session)
-    record = await svc.get_by_hash(hash)
+    record = await svc.get_by_hash(hash, user_id=principal.user_id)
     if not record:
         return {"exists": False}
 
@@ -307,6 +330,7 @@ async def get_data_sync_record_by_hash(
     summary="Delete a DataSyncRecord by ID",
 )
 async def delete_data_sync_record(
+    request: Request,
     id: int = Query(..., description="ID of the DataSyncRecord to delete"),
     session: AsyncSession = Depends(get_db_session),
 ):
@@ -315,6 +339,10 @@ async def delete_data_sync_record(
     Returns HTTP 200 with `{ "deleted": true }` on success, or
     HTTP 404 when the record does not exist.
     """
+
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
     svc = DataSyncService(session)
     # remove any raw rows associated with this sync record first
@@ -325,7 +353,7 @@ async def delete_data_sync_record(
     except Exception:  # pragma: no cover - best-effort cleanup, do not block final deletion
         logger.exception("Failed to delete raw rows for DataSyncRecord id=%s", id)
 
-    deleted = await svc.delete(id)
+    deleted = await svc.delete(id, user_id=principal.user_id)
     if not deleted:
         return {"deleted": False, "message": "Object is not existed"}
 

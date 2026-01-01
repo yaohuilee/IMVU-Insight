@@ -76,12 +76,18 @@ class ProductService:
         per_page: int = 50,
         orders: Optional[list] = None,
         keyword: Optional[str] = None,
+        developer_ids: Optional[list[int]] = None,
     ) -> Tuple[List[Product], int]:
         """Return (items, total_count) for given `page` (1-based) and `per_page`."""
+        if developer_ids is not None and len(developer_ids) == 0:
+            return [], 0
         if page < 1:
             page = 1
         offset = (page - 1) * per_page
         stmt = select(Product)
+
+        if developer_ids is not None:
+            stmt = stmt.where(Product.developer_user_id.in_(developer_ids))
 
         # apply keyword filter when provided (fuzzy match on product_name OR product_id)
         if keyword:
@@ -150,6 +156,8 @@ class ProductService:
         items = res.scalars().all()
 
         count_stmt = select(func.count()).select_from(Product)
+        if developer_ids is not None:
+            count_stmt = count_stmt.where(Product.developer_user_id.in_(developer_ids))
         if keyword:
             kw = keyword.strip()
             if kw:

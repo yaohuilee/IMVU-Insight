@@ -27,8 +27,10 @@ class DataSyncService:
         self.income_service = DataSyncIncomeService(session)
         
 
-    async def get_by_hash(self, hash_value: str) -> Optional[DataSyncRecord]:
+    async def get_by_hash(self, hash_value: str, user_id: Optional[int] = None) -> Optional[DataSyncRecord]:
         stmt = select(DataSyncRecord).where(DataSyncRecord.hash == hash_value).order_by(DataSyncRecord.uploaded_at.desc())
+        if user_id is not None:
+            stmt = stmt.where(DataSyncRecord.user_id == user_id)
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
@@ -41,6 +43,7 @@ class DataSyncService:
         record_count: int,
         file_size: int,
         content: bytes,
+        user_id: int,
     ) -> DataSyncRecord:
         record = DataSyncRecord(
             type=type,
@@ -49,14 +52,17 @@ class DataSyncService:
             record_count=record_count,
             file_size=file_size,
             content=content,
+            user_id=user_id,
         )
         self.session.add(record)
         await self.session.commit()
         await self.session.refresh(record)
         return record
 
-    async def delete(self, record_id: int) -> bool:
+    async def delete(self, record_id: int, user_id: Optional[int] = None) -> bool:
         stmt = select(DataSyncRecord).where(DataSyncRecord.id == record_id)
+        if user_id is not None:
+            stmt = stmt.where(DataSyncRecord.user_id == user_id)
         res = await self.session.execute(stmt)
         record = res.scalar_one_or_none()
         if record is None:
@@ -70,6 +76,7 @@ class DataSyncService:
         page: int = 1,
         page_size: int = 20,
         type: Optional[DataType] = None,
+        user_id: Optional[int] = None,
     ) -> Tuple[Sequence[DataSyncRecord], int]:
         if page < 1:
             page = 1
@@ -78,6 +85,9 @@ class DataSyncService:
 
         base_q = select(DataSyncRecord)
         count_q = select(func.count()).select_from(DataSyncRecord)
+        if user_id is not None:
+            base_q = base_q.where(DataSyncRecord.user_id == user_id)
+            count_q = count_q.where(DataSyncRecord.user_id == user_id)
         if type is not None:
             base_q = base_q.where(DataSyncRecord.type == type)
             count_q = count_q.where(DataSyncRecord.type == type)

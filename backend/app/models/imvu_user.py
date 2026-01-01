@@ -20,4 +20,6 @@ class ImvuUser(Base):
     last_seen_at = Column(DateTime, nullable=False)
 
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    
+    developer_user_id = Column(BigInteger, nullable=False, index=True)
 

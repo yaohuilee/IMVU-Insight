@@ -42,3 +42,4 @@ class DataSyncRecord(Base):
     record_count = Column(Integer, nullable=False)
     file_size = Column(BigInteger, nullable=False)
     content = Column(LargeBinary, nullable=False)
+    user_id = Column(BigInteger, nullable=False, index=True)

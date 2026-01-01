@@ -3,12 +3,13 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db_session
 from app.services.imvu_user_service import ImvuUserService
+from app.services.user_service import UserService
 
 
 router = APIRouter(prefix="/imvu_user", tags=["IMVU User"])
@@ -47,14 +48,31 @@ class PaginatedImvuUserResponse(BaseModel):
     response_model=PaginatedImvuUserResponse,
 )
 async def list_imvu_users(
+    request: Request,
     params: PaginationParams,
     session: AsyncSession = Depends(get_db_session),
 ):
     """Return paginated imvu users (summary fields)."""
 
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    user = await UserService(session).get_by_id(principal.user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    developer_ids = user.developer_ids
+    if not developer_ids:
+        return PaginatedImvuUserResponse(total=0, page=params.page, page_size=params.page_size, items=[])
+
     svc = ImvuUserService(session)
     items, total = await svc.list_paginated(
-        page=params.page, per_page=params.page_size, orders=params.orders, keyword=getattr(params, "keyword", None)
+        page=params.page,
+        per_page=params.page_size,
+        orders=params.orders,
+        keyword=getattr(params, "keyword", None),
+        developer_ids=developer_ids,
     )
 
     result_items = [

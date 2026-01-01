@@ -39,9 +39,19 @@ class DataSyncDeveloperService:
         # Create missing ImvuUser rows for the same IDs
         stmt2 = select(ImvuUser).where(ImvuUser.user_id.in_(developer_ids))
         res2 = await self.session.execute(stmt2)
-        existing_users = {u.user_id for u in res2.scalars().all()}
+        existing_user_rows = res2.scalars().all()
+        existing_users = {u.user_id for u in existing_user_rows}
+        for u in existing_user_rows:
+            if getattr(u, "developer_user_id", None) in (None, 0):
+                u.developer_user_id = u.user_id
         to_create_users = [
-            ImvuUser(user_id=did, user_name=None, first_seen_at=snapshot_dt, last_seen_at=snapshot_dt)
+            ImvuUser(
+                user_id=did,
+                user_name=None,
+                first_seen_at=snapshot_dt,
+                last_seen_at=snapshot_dt,
+                developer_user_id=did,
+            )
             for did in developer_ids
             if did not in existing_users
         ]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -10,7 +10,7 @@ from sqlalchemy import select
 from app.core.db import get_db_session
 from app.services.income_transaction_service import IncomeTransactionService
 from app.routes.imvu_user import ImvuUserSummary, OrderItem
-from app.routes.product import ProductSummary
+from app.routes.product import ProductSummary, _get_user_developer_ids
 
 
 router = APIRouter(prefix="/income_transaction", tags=["IncomeTransaction"])
@@ -69,8 +69,13 @@ class IncomeTransactionPaginationParams(BaseModel):
 )
 async def list_income_transactions(
     params: IncomeTransactionPaginationParams,
+    request: Request,
     session: AsyncSession = Depends(get_db_session),
 ):
+    developer_ids = await _get_user_developer_ids(request, session)
+    if not developer_ids:
+        return PaginatedIncomeTransactionResponse(total=0, page=params.page, page_size=params.page_size, items=[])
+
     svc = IncomeTransactionService(session)
 
     rows, total = await svc.list_paginated_with_relations(
@@ -80,6 +85,7 @@ async def list_income_transactions(
         product_ids=params.product_id,
         buyer_user_ids=params.buyer_user_id,
         recipient_user_ids=params.recipient_user_id,
+        developer_ids=developer_ids,
     )
 
     result_items: list[IncomeTransactionItem] = []

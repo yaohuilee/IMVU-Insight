@@ -133,11 +133,14 @@ class IncomeTransactionService:
         product_ids: Optional[list[int]] = None,
         buyer_user_ids: Optional[list[int]] = None,
         recipient_user_ids: Optional[list[int]] = None,
+        developer_ids: Optional[list[int]] = None,
     ) -> Tuple[List[tuple], int]:
         """Return list of tuples (IncomeTransaction, Product|None, buyer ImvuUser|None, recipient ImvuUser|None) and total count.
 
         This performs a single SQL query with LEFT OUTER JOINs to fetch related product and user rows.
         """
+        if developer_ids is not None and len(developer_ids) == 0:
+            return [], 0
         if page < 1:
             page = 1
         offset = (page - 1) * per_page
@@ -154,6 +157,8 @@ class IncomeTransactionService:
 
         # build optional WHERE clauses for IN-filters (non-empty lists only)
         where_clauses = []
+        if developer_ids:
+            where_clauses.append(IncomeTransaction.developer_user_id.in_(developer_ids))
         if product_ids:
             where_clauses.append(IncomeTransaction.product_id.in_(product_ids))
         if buyer_user_ids:

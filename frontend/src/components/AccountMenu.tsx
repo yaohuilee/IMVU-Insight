@@ -4,6 +4,10 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { SelectLang, useIntl } from '@umijs/max';
 import HeaderDropdown from './HeaderDropdown';
 
+type AccountMenuProps = {
+  collapsed?: boolean;
+};
+
 const handleLogout = () => {
   try {
     localStorage.clear();
@@ -12,7 +16,7 @@ const handleLogout = () => {
   }
 };
 
-const AccountMenu: React.FC = () => {
+const AccountMenu: React.FC<AccountMenuProps> = ({ collapsed }) => {
   const intl = useIntl();
 
   const items = [
@@ -37,7 +41,12 @@ const AccountMenu: React.FC = () => {
   } as any;
 
   return (
-    <Space size="middle">
+    <Space
+      size="middle"
+      direction={collapsed ? 'vertical' : 'horizontal'}
+      align="center"
+      style={{ paddingBottom: collapsed ? 16 : 0 }}
+    >
       <SelectLang />
       <HeaderDropdown menu={dropdownMenuProps} placement="bottomRight">
         <span aria-label="account" style={{ cursor: 'pointer', color: 'inherit' }}>

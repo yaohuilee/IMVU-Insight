@@ -10,7 +10,7 @@ export const layout: RunTimeLayoutConfig = ({ }) => {
     menu: {
       locale: true,
     },
-    rightContentRender: () => React.createElement(AccountMenu, null),
+    rightContentRender: (props) => React.createElement(AccountMenu, { collapsed: props?.collapsed }),
   };
 };
 

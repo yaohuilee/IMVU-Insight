@@ -146,6 +146,21 @@ declare namespace INSIGHT_API {
     created_at: string;
   };
 
+  type IncomeTransactionPaginationParams = {
+    /** Page Page number (1-based) */
+    page?: number;
+    /** Page Size Items per page */
+    page_size?: number;
+    /** Orders */
+    orders?: OrderItem[];
+    /** Product Id */
+    product_id?: number[] | null;
+    /** Buyer User Id */
+    buyer_user_id?: number[] | null;
+    /** Recipient User Id */
+    recipient_user_id?: number[] | null;
+  };
+
   type listDataSyncRecordsParams = {
     /** Page number */
     page?: number;
@@ -153,6 +168,19 @@ declare namespace INSIGHT_API {
     page_size?: number;
     /** Filter by data type */
     type?: DataType | null;
+  };
+
+  type LoginRequest = {
+    /** Username */
+    username: string;
+    /** Password Hash */
+    password_hash: string;
+  };
+
+  type LoginResponse = {
+    /** Success */
+    success: boolean;
+    user?: UserOut | null;
   };
 
   type OrderItem = {
@@ -224,6 +252,8 @@ declare namespace INSIGHT_API {
     page_size?: number;
     /** Orders */
     orders?: OrderItem[];
+    /** Keyword */
+    keyword?: string | null;
   };
 
   type ProductOption = {
@@ -286,6 +316,41 @@ declare namespace INSIGHT_API {
     first_seen: string;
     /** Last Seen */
     last_seen: string;
+  };
+
+  type RefreshRequest = {
+    /** Refresh Token */
+    refresh_token: string;
+  };
+
+  type RefreshResponse = {
+    /** Success */
+    success: boolean;
+    /** Access Token */
+    access_token?: string | null;
+    /** Refresh Token */
+    refresh_token?: string | null;
+  };
+
+  type UserOut = {
+    /** Id */
+    id: number;
+    /** Username */
+    username: string;
+    /** Is Admin */
+    is_admin: boolean;
+    /** Is Active */
+    is_active: boolean;
+    /** Last Login At */
+    last_login_at?: string | null;
+    /** Created At */
+    created_at?: string | null;
+    /** Updated At */
+    updated_at?: string | null;
+    /** Access Token */
+    access_token?: string | null;
+    /** Refresh Token */
+    refresh_token?: string | null;
   };
 
   type ValidationError = {

@@ -2,6 +2,7 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
+import * as auth from './auth';
 import * as buyer from './buyer';
 import * as dataSync from './dataSync';
 import * as health from './health';
@@ -21,4 +22,5 @@ export default {
   incomeTransaction,
   buyer,
   recipient,
+  auth,
 };

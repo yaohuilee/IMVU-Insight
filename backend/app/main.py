@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+from app.security.middleware import AuthMiddleware
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -15,6 +16,7 @@ from app.routes.imvu_user import router as imvu_user_router
 from app.routes.income_transaction import router as income_transaction_router
 from app.routes.buyer import router as buyer_router
 from app.routes.recipient import router as recipient_router
+from app.routes.auth import router as auth_router
 
 
 settings = get_settings()
@@ -24,6 +26,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.add_middleware(AuthMiddleware)
 
 router = APIRouter()
 
@@ -76,3 +79,4 @@ app.include_router(imvu_user_router)
 app.include_router(income_transaction_router)
 app.include_router(buyer_router)
 app.include_router(recipient_router)
+app.include_router(auth_router)

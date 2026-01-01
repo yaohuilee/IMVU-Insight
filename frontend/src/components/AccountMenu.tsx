@@ -3,6 +3,7 @@ import { Space } from 'antd';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { SelectLang, useIntl } from '@umijs/max';
 import HeaderDropdown from './HeaderDropdown';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/constants/auth';
 
 type AccountMenuProps = {
   collapsed?: boolean;
@@ -10,9 +11,20 @@ type AccountMenuProps = {
 
 const handleLogout = () => {
   try {
-    localStorage.clear();
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
   } finally {
-    window.location.href = '/login';
+    const base = (window as any).routerBase || '/';
+    const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+    const loginPath = `${normalizedBase}login`;
+
+    const { pathname, search } = window.location;
+    const redirectTarget = `${pathname}${search}`;
+    const url = redirectTarget
+      ? `${loginPath}?redirect=${encodeURIComponent(redirectTarget)}`
+      : loginPath;
+
+    window.location.href = url;
   }
 };
 

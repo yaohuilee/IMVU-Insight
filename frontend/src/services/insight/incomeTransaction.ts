@@ -4,7 +4,7 @@ import { request } from '@umijs/max';
 
 /** List IncomeTransaction objects (paginated) POST /income_transaction/list */
 export async function listIncomeTransactions(
-  body: INSIGHT_API.PaginationParams,
+  body: INSIGHT_API.IncomeTransactionPaginationParams,
   options?: { [key: string]: any },
 ) {
   return request<INSIGHT_API.PaginatedIncomeTransactionResponse>(

@@ -1,16 +1,21 @@
 export const authConfig = {
     requestInterceptors: [
-        (url: string, options: any = {}) => {
-            const token = localStorage.getItem('token');
-            const headers = { ...(options.headers || {}) };
-            if (token) headers.Authorization = `Bearer ${token}`;
-            return {
-                url,
-                options: {
-                    ...options,
-                    headers,
-                },
-            };
+        (config: any = {}) => {
+            let token: string | null = null;
+            try {
+                token = localStorage.getItem('access_token');
+            } catch {
+                token = null;
+            }
+
+            if (token) {
+                config.headers = {
+                    ...(config.headers || {}),
+                    Authorization: `Bearer ${token}`,
+                };
+            }
+
+            return config;
         },
     ],
 };

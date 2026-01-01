@@ -17,6 +17,7 @@ from .product import Product  # noqa: F401
 from .income_transaction import IncomeTransaction  # noqa: F401
 from .user import User  # noqa: F401
 from .refresh_token import RefreshToken  # noqa: F401
+from .user_developer import UserDeveloper  # noqa: F401
 
 __all__ = [
     "DataSyncRecord",
@@ -28,4 +29,5 @@ __all__ = [
     "IncomeTransaction",
     "User",
     "RefreshToken",
+    "UserDeveloper",
 ]

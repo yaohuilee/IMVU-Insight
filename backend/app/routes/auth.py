@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db_session
@@ -26,6 +26,7 @@ class UserOut(BaseModel):
     username: str
     is_admin: bool
     is_active: bool
+    developer_ids: list[int] = Field(default_factory=list)
     last_login_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -72,6 +73,7 @@ async def current_user(
         username=user.username,
         is_admin=bool(user.is_admin),
         is_active=bool(user.is_active),
+        developer_ids=user.developer_ids,
         last_login_at=user.last_login_at,
         created_at=user.created_at,
         updated_at=user.updated_at,
@@ -101,6 +103,7 @@ async def login(
         username=user.username,
         is_admin=bool(user.is_admin),
         is_active=bool(user.is_active),
+        developer_ids=user.developer_ids,
         last_login_at=user.last_login_at,
         created_at=user.created_at,
         updated_at=user.updated_at,

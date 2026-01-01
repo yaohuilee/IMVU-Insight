@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, BigInteger, String, DateTime, Boolean
+from sqlalchemy.orm import relationship
 
 from . import Base
 
@@ -26,3 +27,15 @@ class User(Base):
 
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    # Mapping rows linking this user to IMVU developer IDs
+    developer_links = relationship(
+        "UserDeveloper",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    @property
+    def developer_ids(self) -> list[int]:
+        return [link.developer_id for link in self.developer_links]

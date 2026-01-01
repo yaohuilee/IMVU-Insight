@@ -4,6 +4,7 @@ from typing import Optional, List, Tuple
 from datetime import datetime
 
 from sqlalchemy import select, func, asc, desc, or_, cast, String
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User
@@ -26,17 +27,32 @@ class UserService:
         return obj
 
     async def get_by_id(self, user_id: int) -> Optional[User]:
-        stmt = select(User).where(User.id == user_id).limit(1)
+        stmt = (
+            select(User)
+            .options(selectinload(User.developer_links))
+            .where(User.id == user_id)
+            .limit(1)
+        )
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
     async def get_by_username(self, username: str) -> Optional[User]:
-        stmt = select(User).where(User.username == username).limit(1)
+        stmt = (
+            select(User)
+            .options(selectinload(User.developer_links))
+            .where(User.username == username)
+            .limit(1)
+        )
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
     async def get_by_username_and_password_hash(self, username: str, password_hash: str) -> Optional[User]:
-        stmt = select(User).where(User.username == username, User.password_hash == password_hash).limit(1)
+        stmt = (
+            select(User)
+            .options(selectinload(User.developer_links))
+            .where(User.username == username, User.password_hash == password_hash)
+            .limit(1)
+        )
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
@@ -99,7 +115,7 @@ class UserService:
             page = 1
         offset = (page - 1) * per_page
 
-        stmt = select(User)
+        stmt = select(User).options(selectinload(User.developer_links))
 
         if keyword:
             kw = keyword.strip()

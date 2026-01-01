@@ -2,14 +2,6 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { refresh } from '@/services/insight/auth';
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/constants/auth';
 
-const getAccessToken = () => {
-    try {
-        return localStorage.getItem(ACCESS_TOKEN_KEY);
-    } catch {
-        return null;
-    }
-};
-
 const getRefreshToken = () => {
     try {
         return localStorage.getItem(REFRESH_TOKEN_KEY);
@@ -34,9 +26,19 @@ const clearTokensAndRedirect = () => {
     } catch {
         /* ignore */
     }
-    if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-    }
+    if (typeof window === 'undefined') return;
+
+    const base = (window as any).routerBase || '/';
+    const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+    const loginPath = `${normalizedBase}login`;
+
+    const { pathname, search } = window.location;
+    const atLogin = pathname === loginPath || pathname === `${loginPath}/`;
+    if (atLogin) return;
+
+    const redirectTarget = `${pathname}${search}`;
+    const redirect = redirectTarget ? `?redirect=${encodeURIComponent(redirectTarget)}` : '';
+    window.location.href = `${loginPath}${redirect}`;
 };
 
 let refreshPromise: Promise<INSIGHT_API.RefreshResponse> | null = null;

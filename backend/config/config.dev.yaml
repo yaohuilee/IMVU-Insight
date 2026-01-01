@@ -2,6 +2,7 @@ app:
   name: "IMVU Insight API"
   env: "dev"
   api_v1_prefix: "/api/v1"
+  root_path: ""
 
 mysql:
   host: "127.0.0.1"

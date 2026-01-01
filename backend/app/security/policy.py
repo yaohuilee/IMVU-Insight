@@ -6,7 +6,10 @@ ALLOWLIST = [
     r"^/auth/refresh$",
     r"^/docs$",
     r"^/openapi\.json$",
+    r"^/health/db$",
     r"^/health$",
+    r"^/favicon\.ico$",
+    r"^/$",
 ]
 
 

@@ -15,6 +15,7 @@ class AppConfig(BaseModel):
 	name: str = "IMVU Insight API"
 	env: str = "dev"
 	api_v1_prefix: str = "/api/v1"
+	root_path: str = ""
 
 
 class MySQLConfig(BaseModel):

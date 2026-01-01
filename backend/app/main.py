@@ -24,6 +24,7 @@ settings = get_settings()
 app = FastAPI(
     title=settings.app.name,
     version="0.1.0",
+    root_path=settings.app.root_path or None,
 )
 
 app.add_middleware(AuthMiddleware)

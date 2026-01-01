@@ -11,9 +11,16 @@ from app.security.models import Principal
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         path = request.url.path
+        root_path = (request.scope.get("root_path") or "").rstrip("/")
+
+        # 兼容 root_path 或反向代理前缀：先尝试去掉前缀再匹配公开路径
+        candidates = [path]
+        if root_path and path.startswith(root_path):
+            stripped = path[len(root_path):] or "/"
+            candidates.append(stripped)
 
         # 放行公开路径
-        if is_public_path(path):
+        if any(is_public_path(p) for p in candidates):
             return await call_next(request)
 
         # 解析 Bearer token

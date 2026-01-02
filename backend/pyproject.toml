@@ -28,6 +28,8 @@ dependencies = [
 
 	# Optional: migrations (can be wired later)
 	"alembic>=1.14.0",
+
+	"cryptography>=46.0.3"
 ]
 
 # uv supports dependency groups (PEP 735)

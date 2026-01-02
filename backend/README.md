@@ -58,7 +58,6 @@ Example (`config.dev.yaml`):
 app:
   name: "IMVU Insight API"
   env: "dev"
-  api_v1_prefix: "/api/v1"
 
 mysql:
   host: "127.0.0.1"

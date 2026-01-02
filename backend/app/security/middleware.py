@@ -3,9 +3,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from app.security.policy import is_public_path
+from app.security.policy import is_docs_path, is_public_path
 from app.security.jwt import decode_token
 from app.security.models import Principal
+from app.core.config import get_settings
+
+
+_ENV = (get_settings().app.env or "dev").lower()
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -13,24 +17,27 @@ class AuthMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         root_path = (request.scope.get("root_path") or "").rstrip("/")
 
-        # 兼容 root_path 或反向代理前缀：先尝试去掉前缀再匹配公开路径
+        # Handle root_path or reverse proxy prefix by stripping prefix before matching public paths
         candidates = [path]
         if root_path and path.startswith(root_path):
             stripped = path[len(root_path):] or "/"
             candidates.append(stripped)
 
-        # 放行公开路径
+        # Allow public paths
+        if any(is_docs_path(p) for p in candidates) and _ENV != "dev":
+            return JSONResponse({"detail": "API docs are disabled outside development."}, status_code=404)
+
         if any(is_public_path(p) for p in candidates):
             return await call_next(request)
 
-        # 解析 Bearer token
+        # Parse Bearer token
         auth = request.headers.get("Authorization", "")
         if not auth.startswith("Bearer "):
             return JSONResponse({"detail": "Not authenticated"}, status_code=401)
 
         token = auth.removeprefix("Bearer ").strip()
 
-        # 校验 token（签名、exp 等）并确保这是访问令牌
+        # Validate token signature/expiry and ensure it is an access token
         try:
             payload = decode_token(token)
         except Exception:
@@ -39,7 +46,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if payload.get("typ") != "access":
             return JSONResponse({"detail": "Invalid token type"}, status_code=401)
 
-        # 注入上下文：业务完全无感
+        # Inject principal into request context
         try:
             user_id = int(payload["sub"])
         except Exception:

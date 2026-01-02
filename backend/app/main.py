@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.db import check_db_connection, get_db_session
+from app.core.logging import configure_logging
 from app.routes.data_sync import router as data_sync_router
 from app.routes.product import router as product_router
 from app.routes.imvu_user import router as imvu_user_router
@@ -20,6 +21,7 @@ from app.routes.auth import router as auth_router
 
 
 settings = get_settings()
+env_mode = (settings.app.env or "dev").lower()
 
 app = FastAPI(
     title=settings.app.name,
@@ -32,7 +34,9 @@ app.add_middleware(AuthMiddleware)
 router = APIRouter()
 
 
+configure_logging()
 logger = logging.getLogger(__name__)
+logger.info("Starting IMVU Insight Backend (%s mode)", env_mode)
 
 
 @router.get("/", operation_id="root")
